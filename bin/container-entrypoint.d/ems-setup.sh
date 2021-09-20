@@ -169,8 +169,15 @@ EOL
         Alias $ALIAS /opt/src/public
 
         RewriteEngine  on
+
+        RewriteCond %{REQUEST_URI} ^$ALIAS/bundles/emsch_assets/ [OR]
+        RewriteCond %{REQUEST_URI} ^$ALIAS/bundles/data/ [OR]
+        RewriteCond %{REQUEST_URI} ^$ALIAS/bundles/public/ [OR]
+        RewriteCond %{REQUEST_URI} ^$ALIAS/bundles/asset/
+        RewriteRule "^$ALIAS" "$ALIAS/index.php\$1" [PT]
+
         RewriteCond %{REQUEST_URI} !^$ALIAS/index.php
-        RewriteCond %{REQUEST_URI} !^$ALIAS/bundles
+        RewriteCond %{REQUEST_URI} !^$ALIAS/bundles/
         RewriteCond %{REQUEST_URI} !^$ALIAS/favicon.ico\$
         RewriteCond %{REQUEST_URI} !^$ALIAS/apple-touch-icon.png\$
         RewriteCond %{REQUEST_URI} !^$ALIAS/robots.txt\$
