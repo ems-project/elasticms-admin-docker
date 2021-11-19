@@ -159,6 +159,8 @@ EOL
 
     ErrorLog /dev/stderr
     CustomLog /dev/stdout common
+    RewriteEngine On
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
 EOL
 
@@ -167,8 +169,6 @@ EOL
     echo "Caution: do not add an alias that exists somewhere in a ems route (i.e. admin)"
     cat >> /etc/apache2/conf.d/$_name.conf << EOL
         Alias $ALIAS /opt/src/public
-
-        RewriteEngine  on
 
         RewriteCond %{REQUEST_URI} ^$ALIAS/bundles/emsch_assets/ [OR]
         RewriteCond %{REQUEST_URI} ^$ALIAS/bundles/data/ [OR]
