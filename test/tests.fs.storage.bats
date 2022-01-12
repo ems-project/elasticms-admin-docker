@@ -8,7 +8,7 @@ load "lib/output"
 
 export BATS_ROOT_DB_USER="${BATS_ROOT_DB_USER:-root}"
 export BATS_ROOT_DB_PASSWORD="${BATS_ROOT_DB_PASSWORD:-password}"
-export BATS_ROOT_DB_NAME="${BATS_ROOT_DB_PASSWORD:-root}"
+export BATS_ROOT_DB_NAME="${BATS_ROOT_DB_NAME:-root}"
 
 export BATS_DB_DRIVER="${BATS_DB_DRIVER:-pgsql}"
 export BATS_DB_HOST="${BATS_DB_HOST:-postgresql}"
