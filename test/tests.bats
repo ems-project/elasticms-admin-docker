@@ -20,6 +20,8 @@ export BATS_DB_NAME="${BATS_DB_NAME:-example}"
 export BATS_REDIS_HOST="${BATS_REDIS_HOST:-redis}"
 export BATS_REDIS_PORT="${BATS_REDIS_PORT:-6379}"
 
+export BATS_METRICS_ENABLED="${BATS_METRICS_ENABLED:-true}"
+
 export BATS_S3_CONFIG_BUCKET_NAME="s3bucket-ems-config/example/config/elasticms"
 export BATS_S3_STORAGE_BUCKET_NAME="s3bucket-example-ems-storage"
 export BATS_S3_ENDPOINT_URL="http://localhost:4572"
@@ -40,7 +42,7 @@ export BATS_STORAGE_SERVICE_NAME="postgresql"
 export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NAME:-docker.io/elasticms/admin:rc}"
 
 @test "[$TEST_FILE] Starting Elasticms Storage Services (S3, PostgreSQL, Elasticsearch, Redis)" {
-  command docker-compose -f docker-compose-s3.yml up -d s3 postgresql es01 es02 es03 redis
+  command docker-compose -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml up -d s3 postgresql es01 es02 es03 redis
   docker_wait_for_log postgresql 240 "LOG:  autovacuum launcher started"
   docker_wait_for_log es01 120 ".*\"type\": \"server\", \"timestamp\": \".*\", \"level\": \".*\", \"component\": \".*\", \"cluster.name\": \".*\", \"node.name\": \".*\", \"message\": \"started\".*"
   docker_wait_for_log es02 120 ".*\"type\": \"server\", \"timestamp\": \".*\", \"level\": \".*\", \"component\": \".*\", \"cluster.name\": \".*\", \"node.name\": \".*\", \"message\": \"started\".*"
@@ -50,7 +52,7 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
 }
 
 @test "[$TEST_FILE] Starting Tika Service" {
-  command docker-compose -f docker-compose-s3.yml up -d tika
+  command docker-compose -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml up -d tika
   docker_wait_for_log tika 120 ".*Started Apache Tika server.*"
 }
 
@@ -60,7 +62,7 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
 
   run aws s3api put-bucket-acl --bucket s3://${BATS_S3_CONFIG_BUCKET_NAME%/} --acl public-read --endpoint-url ${BATS_S3_ENDPOINT_URL}
 
-  for file in ${BATS_TEST_DIRNAME%/}/config/s3/*.properties ; do
+  for file in ${BATS_TEST_DIRNAME%/}/config/*.properties ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
 
@@ -76,7 +78,7 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
 
   run aws s3api put-bucket-acl --bucket s3://${BATS_S3_STORAGE_BUCKET_NAME%/} --acl public-read --endpoint-url ${BATS_S3_ENDPOINT_URL}
 
-  for file in ${BATS_TEST_DIRNAME%/}/config/s3/*.properties ; do
+  for file in ${BATS_TEST_DIRNAME%/}/config/*.properties ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
 
@@ -100,12 +102,12 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
   export BATS_TIKA_LOCAL_ENDPOINT_URL=http://$(docker_ip tika):9998
   export BATS_REDIS_HOST=$(docker_ip redis)
 
-  command docker-compose -f docker-compose-s3.yml up -d elasticms
+  command docker-compose -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml up -d elasticms
 
 }
 
 @test "[$TEST_FILE] Check for Elasticms startup messages in containers logs (S3)" {
-  for file in ${BATS_TEST_DIRNAME%/}/config/s3/*.properties ; do
+  for file in ${BATS_TEST_DIRNAME%/}/config/*.properties ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
     docker_wait_for_log ems 15 "Install \[ ${_name} \] CMS Domain from S3 Bucket \[ ${_basename} \] file successfully ..."
@@ -120,7 +122,7 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
 }
 
 @test "[$TEST_FILE] Create Elasticms Super Admin user in running container for all configured domains (S3)" {
-  for file in ${BATS_TEST_DIRNAME%/}/config/s3/*.properties ; do
+  for file in ${BATS_TEST_DIRNAME%/}/config/*.properties ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
 
@@ -136,19 +138,19 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
 }
 
 @test "[$TEST_FILE] Rebuild Elasticms Environments for all configured domains (S3)" {
-  for file in ${BATS_TEST_DIRNAME%/}/config/s3/*.properties ; do
+  for file in ${BATS_TEST_DIRNAME%/}/config/*.properties ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
-
-    envsubst < $file > /tmp/$_name
-    source /tmp/$_name
 
     environments=(`docker exec ems sh -c "/opt/bin/$_name ems:environment:list"`)
 
     for environment in ${environments[@]}; do
 
       run docker exec ems sh -c "/opt/bin/$_name ems:environment:rebuild $environment --yellow-ok"
-      #assert_output -r ".*The alias ${EMS_INSTANCE_ID%_}_${environment} is now point to.*"
+      #
+      # Comment as long as we don't want to continue to made tests based on content loaded from a db dump.
+      #
+      # assert_output -l -r "The alias ${environment} is now pointing to"
 
     done
 
@@ -168,7 +170,7 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
 }
 
 @test "[$TEST_FILE] Check for Elasticms status page response code 200 for all configured domains (S3)" {
-  for file in ${BATS_TEST_DIRNAME%/}/config/s3/*.properties ; do
+  for file in ${BATS_TEST_DIRNAME%/}/config/*.properties ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
 
@@ -179,6 +181,22 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
     assert_output -l 0 $'200'
 
     retry 12 5 curl_container ems :9000/health_check.json -H "Host: ${SERVER_NAME}" -s -w %{http_code} -o /dev/null
+    assert_output -l 0 $'200'
+
+    rm /tmp/$_name
+
+  done
+}
+
+@test "[$TEST_FILE] Check for Elasticms metrics page response code 200 for all configured domains (S3)" {
+  for file in ${BATS_TEST_DIRNAME%/}/config/*.properties ; do
+    _basename=$(basename $file)
+    _name=${_basename%.*}
+
+    envsubst < $file > /tmp/$_name
+    source /tmp/$_name
+
+    retry 12 5 curl_container ems :9090/metrics -H "Host: ${SERVER_NAME}:9090" -s -w %{http_code} -o /dev/null
     assert_output -l 0 $'200'
 
     rm /tmp/$_name
@@ -201,7 +219,21 @@ export BATS_ELASTICMS_ADMIN_DOCKER_IMAGE_NAME="${ELASTICMS_ADMIN_DOCKER_IMAGE_NA
   assert_output -l 0 $'200'
 }
 
+@test "[$TEST_FILE] Check for Website Skeleton metrics page response code 200." {
+  
+  retry 12 5 curl_container ems :9090/metrics -s -w %{http_code} -o /dev/null
+  assert_output -l 0 $'200'
+
+}
+
+@test "[$TEST_FILE] Check for Website Skeleton metrics page." {
+  
+  retry 12 5 curl_container ems :9090/metrics -s
+  assert_output -l -r "ems_info\{client=\".*\",common=\".*\",form=\".*\",submission=\".*\",symfony=\".*\"\}"
+
+}
+
 @test "[$TEST_FILE] Stop all and delete test containers" {
-  command docker-compose -f docker-compose-s3.yml stop
-  command docker-compose -f docker-compose-s3.yml rm -v -f  
+  command docker-compose -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml stop
+  command docker-compose -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml rm -v -f  
 }

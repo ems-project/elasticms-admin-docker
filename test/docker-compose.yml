@@ -1,6 +1,20 @@
 version: "2"
 
 services:
+  s3:
+    image: docker.io/localstack/localstack:0.8.8
+    container_name: s3
+    ports:
+      - 4572:4572
+    environment:
+      - SERVICES=s3
+      - DEBUG=true
+      - DATA_DIR=/tmp/localstack/data
+      - PORT_WEB_UI=8080
+    networks:
+      - default
+    mem_limit: 512m
+
   tika:
     image: docker.io/smalswebtech/tika-server:latest
     container_name: tika
@@ -24,7 +38,14 @@ services:
     container_name: ems
     ports:
       - 9000:9000
-    environment: 
+      - 9090:9090
+    environment:
+      - AWS_S3_STORAGE_BUCKET_NAME=${BATS_S3_STORAGE_BUCKET_NAME}
+      - AWS_S3_CONFIG_BUCKET_NAME=${BATS_S3_CONFIG_BUCKET_NAME}
+      - AWS_S3_ENDPOINT_URL=${BATS_S3_ENDPOINT_URL}
+      - AWS_ACCESS_KEY_ID=${BATS_S3_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${BATS_S3_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${BATS_S3_DEFAULT_REGION}
       - PHP_FPM_MAX_CHILDREN=${BATS_PHP_FPM_MAX_CHILDREN}
       - PHP_FPM_REQUEST_MAX_MEMORY_IN_MEGABYTES=${BATS_PHP_FPM_REQUEST_MAX_MEMORY_IN_MEGABYTES}
       - CONTAINER_HEAP_PERCENT=${BATS_CONTAINER_HEAP_PERCENT}
@@ -36,14 +57,18 @@ services:
       - DB_USER=${BATS_DB_USER}
       - DB_PASSWORD=${BATS_DB_PASSWORD}
       - DB_NAME=${BATS_DB_NAME}
+      - TIKA_SERVER_SERVICE_HOST=${BATS_TIKA_SERVER_SERVICE_HOST}
+      - TIKA_SERVER_SERVICE_PORT=${BATS_TIKA_SERVER_SERVICE_PORT}
+      - REDIS_HOST=${BATS_REDIS_HOST}
+      - REDIS_PORT=${BATS_REDIS_PORT}
+      - METRICS_ENABLED=${BATS_METRICS_ENABLED}
     links:
       - ${BATS_STORAGE_SERVICE_NAME}:${BATS_STORAGE_SERVICE_NAME}
+      - s3:s3
     depends_on:
       - ${BATS_STORAGE_SERVICE_NAME}
+      - s3
     command: ["wait-for-it", "${BATS_DB_HOST}:${BATS_DB_PORT}", "--", "/usr/bin/supervisord", "-c", "/etc/supervisord/supervisord.conf"]
-    volumes:
-      - data_ems:/var/lib/ems
-      - config_ems:/opt/secrets
     networks:
       - default
     build:
@@ -115,13 +140,12 @@ services:
       - default
     mem_limit: 1024m
 
-volumes:
-  data_ems:
-    external:
-      name: ${BATS_EMS_STORAGE_VOLUME_NAME}
-  config_ems:
-    external:
-      name: ${BATS_EMS_CONFIG_VOLUME_NAME}
+  redis:
+    image: centos/redis-5-centos7
+    container_name: redis
+    networks:
+      - default
+    mem_limit: 512m
 
 networks:
   default:
