@@ -78,7 +78,7 @@ jobs:
 
       - name: Build Docker Image
         id: build
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -108,7 +108,7 @@ jobs:
 
       - name: Push Docker Image
         id: push
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
