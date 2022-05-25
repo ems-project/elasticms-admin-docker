@@ -16,6 +16,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3.0.2
 
+      - uses: actions/checkout@v2.4.0
+        with:
+          repository: ems-project/elasticms-demo
+          path: test/demo
+
+      - name: Prepare Elasticms Demo Project
+        id: prep_demo
+        run: |
+          mkdir -p test/demo/dist
+          npm install --save-dev webpack --prefix test/demo test/demo
+          npm run --prefix test/demo prod
+          chmod 777 test/demo/skeleton
+
       - name: Fill GitHub Environment Variables
         uses: FranzDiebold/github-env-vars-action@v2.3.1
 
@@ -46,7 +59,7 @@ jobs:
 
       - name: Fill Docker Image metadata
         id: meta
-        uses: crazy-max/ghaction-docker-meta@v3.6.2
+        uses: crazy-max/ghaction-docker-meta@v4.0.1
         with:
           images: "${{ steps.prep.outputs.imagename }}"
           tags: |
@@ -78,7 +91,7 @@ jobs:
 
       - name: Build Docker Image
         id: build
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -107,7 +120,7 @@ jobs:
 
       - name: Push Docker Image
         id: push
-        uses: docker/build-push-action@v2.7.0
+        uses: docker/build-push-action@v3.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -130,4 +143,3 @@ jobs:
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         run: |
           docker pull ${{ steps.prep.outputs.imagename }}:${{ steps.prep.outputs.version_major_minor_patch }}
-

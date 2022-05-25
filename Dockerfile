@@ -52,6 +52,7 @@ RUN echo -e "\nListen ${EMS_METRIC_PORT}\n" >> /etc/apache2/httpd.conf \
     && find /opt -type d -exec chmod ug+x {} \; 
 
 USER ${PUID:-1001}
+
 EXPOSE ${EMS_METRIC_PORT}/tcp
 
 HEALTHCHECK --start-period=10s --interval=1m --timeout=5s --retries=5 \
