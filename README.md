@@ -27,7 +27,8 @@ docker build --build-arg VERSION_ARG=${ELASTICMS_ADMIN_VERSION} \
 bats test/tests.bats
 ```
 
-# Environment variables
+# Environment variables  
+
 ## CLI_PHP_MEMORY_LIMIT
 Refers to the PHP memory limit of the Symfony CLI. This variable can be defined per project or globally for all projects. Or even defined globally and overridden per project. To define it globally use regular environment mechanisms, such -e attribute in docker command. To defnie it per projet, define this variable in the project's Dotenv file. The default value is set to '512M'. Mor information about the [php_limit](https://www.php.net/manual/en/ini.core.php#ini.memory-limit) directive.
 
@@ -52,7 +53,7 @@ Return ElasticMS Prometheus metrics.
 # Magick command to remove all
 ```docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)```
 
-Caution, it removes every running pods.
+Caution, it removes every running containers.
 
 If you want to also remove all persisted data in your docker environment:
 `docker volume rm $(docker volume ls -q)`
