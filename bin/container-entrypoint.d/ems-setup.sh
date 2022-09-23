@@ -221,7 +221,7 @@ function configure (
     fi
   fi
 
-  echo "Sync Doctrine database migration for [ $_name ] CMS Domain ..."
+  echo "Running Doctrine database migration (sync-metadata-storage) for [ $_name ] CMS Domain ..."
   /opt/bin/$_name doctrine:migrations:sync-metadata-storage --no-interaction
   if [ $? -eq 0 ]; then
     echo "Doctrine sync metadata storage for [ $_name ] CMS Domain run successfully ..."
