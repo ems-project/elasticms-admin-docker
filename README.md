@@ -1,4 +1,4 @@
-# elasticms-admin-docker [![Docker Build](https://github.com/ems-project/elasticms-admin-docker/actions/workflows/docker-build.yml/badge.svg?branch=5.x)](https://github.com/ems-project/elasticms-web-docker/actions/workflows/docker-build.yml) 
+# elasticms-admin-docker [![Docker Build](https://github.com/ems-project/elasticms-admin-docker/actions/workflows/docker-build.yml/badge.svg?branch=5.x)](https://github.com/ems-project/elasticms-admin-docker/actions/workflows/docker-build.yml) 
 
 ElasticMS in Docker containers
 
