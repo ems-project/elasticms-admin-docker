@@ -92,6 +92,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: Dockerfile
+          target: prd
           build-args: |
             VERSION_ARG=${{ needs.init.outputs.version-patch }}
             RELEASE_ARG=${{ needs.init.outputs.github-ci-run-id }}

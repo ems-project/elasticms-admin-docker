@@ -27,6 +27,7 @@ jobs:
         id: prep
         run: |
           echo "docker-image-name=${DOCKER_IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "docker-image-name-dev=${DOCKER_IMAGE_NAME}-dev" >> $GITHUB_OUTPUT
           echo "build-date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
       - name: Fill Docker Image metadata
@@ -35,6 +36,15 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: "${{ steps.prep.outputs.docker-image-name }}"
+          tags: |
+            type=raw,value=rc
+
+      - name: Fill Docker Image metadata (Dev)
+        id: meta-dev
+        uses: docker/metadata-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          images: "${{ steps.prep.outputs.docker-image-name-dev }}"
           tags: |
             type=raw,value=rc
 
@@ -57,6 +67,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: Dockerfile
+          target: prd
           build-args: |
             VERSION_ARG=${{ env.ELASTICMS_ADMIN_VERSION }}
             RELEASE_ARG=${{ env.CI_RUN_ID }}
@@ -68,18 +79,45 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=docker,dest=/tmp/myimage.tar
 
+      - name: Build Docker Image (Dev)
+        id: build-dev
+        uses: docker/build-push-action@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: Dockerfile
+          target: dev
+          build-args: |
+            VERSION_ARG=${{ env.ELASTICMS_ADMIN_VERSION }}
+            RELEASE_ARG=${{ env.CI_RUN_ID }}
+            VCS_REF_ARG=${{ env.CI_SHA }}
+            BUILD_DATE_ARG=${{ steps.prep.outputs.build-date }}
+          push: false
+          load: true
+          tags: ${{ steps.meta-dev.outputs.tags }}
+          labels: ${{ steps.meta-dev.outputs.labels }}
+          outputs: type=docker,dest=/tmp/myimage-dev.tar
+
       - name: Squash Docker Image
         id: squash
         run: |
           pip install docker-squash
           cat /tmp/myimage.tar | docker load
+          cat /tmp/myimage-dev.tar | docker load
           docker-squash --verbose --message "Build and Squashed in GitHub Action" \
             --tag ${{ steps.prep.outputs.docker-image-name }}:rc \
             --output-path /tmp/myimage.tar \
             ${{ steps.prep.outputs.docker-image-name }}:rc
+          docker-squash --verbose --message "Build and Squashed in GitHub Action" \
+            --tag ${{ steps.prep.outputs.docker-image-name-dev }}:rc \
+            --output-path /tmp/myimage-dev.tar \
+            ${{ steps.prep.outputs.docker-image-name-dev }}:rc
           cat /tmp/myimage.tar | docker load
+          cat /tmp/myimage-dev.tar | docker load
 
       - name: Check Docker Image
         run: |
           docker image inspect ${{ steps.prep.outputs.docker-image-name }}:rc
+          docker image inspect ${{ steps.prep.outputs.docker-image-name-dev }}:rc
           docker history ${{ steps.prep.outputs.docker-image-name }}:rc
+          docker history ${{ steps.prep.outputs.docker-image-name-dev }}:rc
