@@ -3,28 +3,47 @@
 ElasticMS in Docker containers
 
 ## Prerequisite
-Before launching the bats commands you must defined the following environment variables:
-```dotenv
-ELASTICMS_ADMIN_VERSION=1.14.15 #the elasticms's version you want to test
-DOCKER_IMAGE_NAME=docker.io/elasticms/admin:rc # The ElasticMS Docker image name  
-```
-You must also install `bats`.
+
+You must install `bats`, `make`.
 
 # Build
 
 ```sh
-docker build --build-arg VERSION_ARG=${ELASTICMS_ADMIN_VERSION} \
-             --build-arg RELEASE_ARG=snapshot \
-             --build-arg BUILD_DATE_ARG=snapshot \
-             --build-arg VCS_REF_ARG=snapshot \
-             --build-arg GITHUB_TOKEN_ARG=${GITHUB_TOKEN} \
-             --tag ${DOCKER_IMAGE_NAME} .
+make build[-dev] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to build> [ DOCKER_IMAGE_NAME=<ElasticMS Admin Docker Image Name you want to build> ]
 ```
+
+## Example building __prd__ Docker image
+
+```sh
+make build ELASTICMS_ADMIN_VERSION=5.0.1
+```
+
+__Provide docker image__ : `docker.io/elasticms/website-skeleton:5.0.1-prd`
+
+## Example building __dev__ Docker image
+
+```sh
+make build-dev ELASTICMS_ADMIN_VERSION=5.0.1
+```
+
+__Provide docker image__ : `docker.io/elasticms/website-skeleton:5.0.1-dev`
 
 # Test
 
 ```sh
-bats test/tests.bats
+make test[-dev] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to test>
+```
+
+## Example testing of __prd__ builded docker image
+
+```sh
+make test ELASTICMS_ADMIN_VERSION=5.0.1
+```
+
+## Example testing of __dev__ builded docker image
+
+```sh
+make test-dev ELASTICMS_ADMIN_VERSION=5.0.1
 ```
 
 # Environment variables
