@@ -1,46 +1,65 @@
-#!make
-include .build.env
+#!/usr/bin/make -f
 
+ifneq (,$(wildcard ./.build.env))
+    include .build.env
+    export
+endif
+
+GIT_HASH ?= $(shell git log --format="%h" -n 1)
 BUILD_DATE ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
-_BUILD_ARGS_TAG ?= latest
+# Default ElasticMS CLI version (if no .build.env file provided)
+ELASTICMS_ADMIN_VERSION ?= 5.0.0
+
+# Default Docker image name (if no .build.env file provided)
+DOCKER_IMAGE_NAME ?= docker.io/elasticms/cli
+
 _BUILD_ARGS_TARGET ?= prd
+_BUILD_ARGS_TAG ?= latest
 
 .DEFAULT_GOAL := help
-.PHONY: help build test
+.PHONY: help build build-dev build-all test test-dev test-all
 
-help: ## Show this help
-	@egrep '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+help: # Show help for each of the Makefile recipes.
+	@grep -E '^[a-zA-Z0-9 -]+:.*#'  Makefile | sort | while read -r l; do printf "\033[1;32m$$(echo $$l | cut -f 1 -d':')\033[00m:$$(echo $$l | cut -f 2- -d'#')\n"; done
 
-build: ## Build Docker image (PRD)
-		$(MAKE) _build_prd
+build: # Build [elasticms-cli] [prd] variant Docker images
+	@$(MAKE) -s _build-prd
 
-build-dev: ## Build Docker image (DEV)
-		$(MAKE) _build_dev
+build-dev: # Build [elasticms-cli] [dev] variant Docker images
+	@$(MAKE) -s _build-dev
 
-_build_%: 
-		$(MAKE) _builder \
-			-e _BUILD_ARGS_TAG="${ELASTICMS_ADMIN_VERSION}-$*" \
-			-e _BUILD_ARGS_TARGET="$*"
+build-all: # Build [elasticms-cli] [prd,dev] variant Docker images
+	@$(MAKE) -s _build-prd
+	@$(MAKE) -s _build-dev
+
+_build-%: 
+	@$(MAKE) _builder \
+		-e _BUILD_ARGS_TAG="${ELASTICMS_ADMIN_VERSION}-$*" \
+		-e _BUILD_ARGS_TARGET="$*"
 
 _builder:
-		docker build \
-			--build-arg VERSION_ARG="${ELASTICMS_ADMIN_VERSION}" \
-			--build-arg RELEASE_ARG="${_BUILD_ARGS_TAG}" \
-			--build-arg BUILD_DATE_ARG="${BUILD_DATE}" \
-			--build-arg VCS_REF_ARG="${GIT_HASH}" \
-			--target ${_BUILD_ARGS_TARGET} \
-			--tag ${DOCKER_IMAGE_NAME}:${_BUILD_ARGS_TAG} .
+	@docker build \
+		--build-arg VERSION_ARG="${ELASTICMS_ADMIN_VERSION}" \
+		--build-arg RELEASE_ARG="${_BUILD_ARGS_TAG}" \
+		--build-arg BUILD_DATE_ARG="${BUILD_DATE}" \
+		--build-arg VCS_REF_ARG="${GIT_HASH}" \
+		--target ${_BUILD_ARGS_TARGET} \
+		--tag ${DOCKER_IMAGE_NAME}:${_BUILD_ARGS_TAG} .
 
-test: ## Test Docker image (PRD)
-		$(MAKE) _tester_prd
+test: # Test [elasticms-cli] [prd] variant Docker images
+	@$(MAKE) -s _tester-prd
 
-test-dev: ## Test Docker image (DEV)
-		$(MAKE) _tester_dev
+test-dev: # Test [elasticms-cli] [dev] variant Docker images
+	@$(MAKE) -s _tester-dev
 
-_tester_%: 
-		$(MAKE) _tester \
-			-e DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME}:${ELASTICMS_ADMIN_VERSION}-$*"
+test-all: # Test [elasticms-cli] [prd,dev] variant Docker images
+	@$(MAKE) -s _tester-prd
+	@$(MAKE) -s _tester-dev
+
+_tester-%: 
+	@$(MAKE) -s _tester \
+		-e DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME}:${ELASTICMS_ADMIN_VERSION}-$*"
 
 _tester:
-		bats test/tests.bats
+	@bats test/tests.bats
