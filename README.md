@@ -9,44 +9,66 @@ You must install `bats`, `make`.
 # Build
 
 ```sh
-make build[-dev] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to build> [ DOCKER_IMAGE_NAME=<ElasticMS Admin Docker Image Name you want to build> ]
+make build[-dev|-all] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to build> [ DOCKER_IMAGE_NAME=<ElasticMS Admin Docker Image Name you want to build> ]
 ```
 
 ## Example building __prd__ Docker image
 
 ```sh
-make build ELASTICMS_ADMIN_VERSION=5.0.1
+make build ELASTICMS_ADMIN_VERSION=5.1.2
 ```
 
-__Provide docker image__ : `docker.io/elasticms/website-skeleton:5.0.1-prd`
+__Provide docker image__ : `docker.io/elasticms/admin:5.1.2-prd`
 
 ## Example building __dev__ Docker image
 
 ```sh
-make build-dev ELASTICMS_ADMIN_VERSION=5.0.1
+make build-dev ELASTICMS_ADMIN_VERSION=5.1.2
 ```
 
-__Provide docker image__ : `docker.io/elasticms/website-skeleton:5.0.1-dev`
+__Provide docker image__ : `docker.io/elasticms/admin:5.1.2-dev`
 
 # Test
 
 ```sh
-make test[-dev] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to test>
+make test[-dev|-all] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to test>
 ```
 
 ## Example testing of __prd__ builded docker image
 
 ```sh
-make test ELASTICMS_ADMIN_VERSION=5.0.1
+make test ELASTICMS_ADMIN_VERSION=5.1.2
 ```
 
 ## Example testing of __dev__ builded docker image
 
 ```sh
-make test-dev ELASTICMS_ADMIN_VERSION=5.0.1
+make test-dev ELASTICMS_ADMIN_VERSION=5.1.2
 ```
 
-# Environment variables
+# Releases
+
+Releases are done via GitHub actions and uploaded on Docker Hub.
+
+# Supported tags and respective Dockerfile links
+
+- [`5.x.y`, `5.x`, `5`, `5.x.y-prd`, `5.x-prd`, `5-prd`, `5.x.y-dev`, `5.x-dev`, `5-dev`](Dockerfile)
+
+# Image Variants
+
+The elasticms/admin images come in many flavors, each designed for a specific use case.
+
+## `docker.io/elasticms/admin:<version>[-prd]`  
+
+This variant contains the [ElasticMS Admin](https://github.com/ems-project/elasticms-admin) installed in a Production PHP environment.  
+
+## `docker.io/elasticms/admin:<version>-dev`
+
+This variant contains the [ElasticMS Admin](https://github.com/ems-project/elasticms-admin) installed in a Development PHP environment.  
+
+# Configuration
+
+## Environment variables
 
 | Variable Name | Description | Default | Example |
 | - | - | - | - |
@@ -59,8 +81,6 @@ make test-dev ELASTICMS_ADMIN_VERSION=5.0.1
 | APACHE_X_FRAME_OPTIONS | The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a `<frame>`, `<iframe>`, `<embed>` or `<object>`. | `SAMEORIGIN` | `DENY` |
 | APACHE_X_XSS_PROTECTION | The HTTP X-XSS-Protection response header is a feature of Internet Explorer, Chrome and Safari that stops pages from loading when they detect reflected cross-site scripting (XSS) attacks. | `1` | `1; mode=block`, `0` |
 | APACHE_X_CONTENT_TYPE_OPTIONS | The X-Content-Type-Options response HTTP header is a marker used by the server to indicate that the MIME types advertised in the Content-Type headers should be followed and not be changed. | `nosniff` | `` |
-
-
 
 ## METRIC_ENABLED
 Return ElasticMS Prometheus metrics.  
