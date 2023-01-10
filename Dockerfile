@@ -1,4 +1,4 @@
-FROM docker.io/elasticms/base-php-dev:8.1 as builder
+FROM docker.io/elasticms/base-php:8.1-apache-dev as builder
 
 ARG VERSION_ARG=""
 ARG RELEASE_ARG=""
@@ -15,7 +15,7 @@ RUN echo "Download and install ElastiCMS ..." \
     && COMPOSER_MEMORY_LIMIT=-1 composer -vvvv install --no-interaction --no-suggest --no-scripts --working-dir /opt/src -o  \
     && rm -rf /opt/src/bootstrap/cache/* /opt/src/.env /opt/src/.env.dist 
 
-FROM docker.io/elasticms/base-apache-fpm:8.1 as prd
+FROM docker.io/elasticms/base-php:8.1-apache as prd
 
 ARG VERSION_ARG=""
 ARG RELEASE_ARG=""
@@ -59,7 +59,7 @@ EXPOSE ${EMS_METRIC_PORT}/tcp
 HEALTHCHECK --start-period=10s --interval=1m --timeout=5s --retries=5 \
         CMD curl --fail --header "Host: default.localhost" http://localhost:9000/index.php || exit 1
 
-FROM docker.io/elasticms/base-apache-dev:8.1 as dev
+FROM docker.io/elasticms/base-php:8.1-apache-dev as dev
 
 ARG VERSION_ARG=""
 ARG RELEASE_ARG=""
