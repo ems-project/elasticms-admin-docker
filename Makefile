@@ -23,18 +23,18 @@ _BUILD_ARGS_TAG ?= latest
 help: # Show help for each of the Makefile recipes.
 	@grep -E '^[a-zA-Z0-9 -]+:.*#'  Makefile | sort | while read -r l; do printf "\033[1;32m$$(echo $$l | cut -f 1 -d':')\033[00m:$$(echo $$l | cut -f 2- -d'#')\n"; done
 
-build: # Build [elasticms-cli] [prd] variant Docker images
+build: # Build [elasticms-admin] [prd] variant Docker images
 	@$(MAKE) -s _build-prd
 
-build-dev: # Build [elasticms-cli] [dev] variant Docker images
+build-dev: # Build [elasticms-admin] [dev] variant Docker images
 	@$(MAKE) -s _build-dev
 
-build-all: # Build [elasticms-cli] [prd,dev] variant Docker images
+build-all: # Build [elasticms-admin] [prd,dev] variant Docker images
 	@$(MAKE) -s _build-prd
 	@$(MAKE) -s _build-dev
 
 _build-%: 
-	@$(MAKE) _builder \
+	@$(MAKE) -s _builder \
 		-e _BUILD_ARGS_TAG="${ELASTICMS_ADMIN_VERSION}-$*" \
 		-e _BUILD_ARGS_TARGET="$*"
 
@@ -47,13 +47,13 @@ _builder:
 		--target ${_BUILD_ARGS_TARGET} \
 		--tag ${DOCKER_IMAGE_NAME}:${_BUILD_ARGS_TAG} .
 
-test: # Test [elasticms-cli] [prd] variant Docker images
+test: # Test [elasticms-admin] [prd] variant Docker images
 	@$(MAKE) -s _tester-prd
 
-test-dev: # Test [elasticms-cli] [dev] variant Docker images
+test-dev: # Test [elasticms-admin] [dev] variant Docker images
 	@$(MAKE) -s _tester-dev
 
-test-all: # Test [elasticms-cli] [prd,dev] variant Docker images
+test-all: # Test [elasticms-admin] [prd,dev] variant Docker images
 	@$(MAKE) -s _tester-prd
 	@$(MAKE) -s _tester-dev
 
