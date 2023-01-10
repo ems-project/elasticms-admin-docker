@@ -8,7 +8,7 @@ endif
 GIT_HASH ?= $(shell git log --format="%h" -n 1)
 BUILD_DATE ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
-# Default ElasticMS CLI version (if no .build.env file provided)
+# Default ElasticMS Admin version (if no .build.env file provided)
 ELASTICMS_ADMIN_VERSION ?= 5.0.0
 
 # Default Docker image name (if no .build.env file provided)
