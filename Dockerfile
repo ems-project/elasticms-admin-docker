@@ -22,17 +22,17 @@ ARG RELEASE_ARG=""
 ARG BUILD_DATE_ARG=""
 ARG VCS_REF_ARG=""
 
-LABEL eu.elasticms.admin.build-date=$BUILD_DATE_ARG \
-      eu.elasticms.admin.name="ElasticMS - Admin." \
-      eu.elasticms.admin.description="A minimal CMS to manage generic content in order to publish it in several Elasticsearch index." \
-      eu.elasticms.admin.url="https://www.elasticms.eu/" \
-      eu.elasticms.admin.vcs-ref=$VCS_REF_ARG \
-      eu.elasticms.admin.vcs-url="https://github.com/ems-project/elasticms-admin" \
-      eu.elasticms.admin.vendor="sebastian.molle@gmail.com" \
-      eu.elasticms.admin.version="$VERSION_ARG" \
-      eu.elasticms.admin.release="$RELEASE_ARG" \
-      eu.elasticms.admin.schema-version="1.0" \
-      eu.elasticms.admin.docker-image="all-in-one"
+LABEL be.fgov.elasticms.admin.build-date=$BUILD_DATE_ARG \
+      be.fgov.elasticms.admin.name="elasticms-admin" \
+      be.fgov.elasticms.admin.description="Admin of the ElasticMS suite." \
+      be.fgov.elasticms.admin.url="https://hub.docker.com/repository/docker/elasticms/admin" \
+      be.fgov.elasticms.admin.vcs-ref=$VCS_REF_ARG \
+      be.fgov.elasticms.admin.vcs-url="https://github.com/ems-project/elasticms-admin-docker" \
+      be.fgov.elasticms.admin.vendor="sebastian.molle@gmail.com" \
+      be.fgov.elasticms.admin.version="$VERSION_ARG" \
+      be.fgov.elasticms.admin.release="$RELEASE_ARG" \
+      be.fgov.elasticms.admin.environment="prd" \
+      be.fgov.elasticms.admin.schema-version="1.0"
 
 USER root
 
@@ -66,17 +66,18 @@ ARG RELEASE_ARG=""
 ARG BUILD_DATE_ARG=""
 ARG VCS_REF_ARG=""
 
-LABEL eu.elasticms.admin.build-date=$BUILD_DATE_ARG \
-      eu.elasticms.admin.name="ElasticMS - Admin. (DEV)" \
-      eu.elasticms.admin.description="A minimal CMS to manage generic content in order to publish it in several Elasticsearch index." \
-      eu.elasticms.admin.url="https://www.elasticms.eu/" \
-      eu.elasticms.admin.vcs-ref=$VCS_REF_ARG \
-      eu.elasticms.admin.vcs-url="https://github.com/ems-project/elasticms-admin" \
-      eu.elasticms.admin.vendor="sebastian.molle@gmail.com" \
-      eu.elasticms.admin.version="$VERSION_ARG" \
-      eu.elasticms.admin.release="$RELEASE_ARG" \
-      eu.elasticms.admin.schema-version="1.0" \
-      eu.elasticms.admin.docker-image="all-in-one"
+LABEL be.fgov.elasticms.admin.build-date=$BUILD_DATE_ARG \
+      be.fgov.elasticms.admin.name="elasticms-admin" \
+      be.fgov.elasticms.admin.description="Admin of the ElasticMS suite." \
+      be.fgov.elasticms.admin.url="https://hub.docker.com/repository/docker/elasticms/admin" \
+      be.fgov.elasticms.admin.vcs-ref=$VCS_REF_ARG \
+      be.fgov.elasticms.admin.vcs-url="https://github.com/ems-project/elasticms-admin-docker" \
+      be.fgov.elasticms.admin.vendor="sebastian.molle@gmail.com" \
+      be.fgov.elasticms.admin.version="$VERSION_ARG" \
+      be.fgov.elasticms.admin.release="$RELEASE_ARG" \
+      be.fgov.elasticms.admin.environment="dev" \
+      be.fgov.elasticms.admin.schema-version="1.0"
+
 
 USER root
 
