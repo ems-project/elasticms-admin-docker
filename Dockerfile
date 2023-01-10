@@ -5,7 +5,7 @@ ARG RELEASE_ARG=""
 ARG BUILD_DATE_ARG=""
 ARG VCS_REF_ARG=""
 
-ENV ELASTICMS_VERSION=${VERSION_ARG:-5.0.1} \
+ENV ELASTICMS_VERSION=${VERSION_ARG:-5.1.2} \
     ELASTICMS_DOWNLOAD_URL="https://github.com/ems-project/elasticms-admin/archive" 
 
 RUN echo "Download and install ElastiCMS ..." \
