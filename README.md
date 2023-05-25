@@ -2,11 +2,19 @@
 
 ElasticMS in Docker containers
 
+# Build
+
 ## Prerequisite
 
-You must install `bats`, `make`.
+You must install `make`, `m4`.
 
-# Build
+## Generate Dockerfile
+
+```sh
+make Dockefile
+```
+
+## Build locally Docker images
 
 ```sh
 make build[-dev|-all] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to build> [ DOCKER_IMAGE_NAME=<ElasticMS Admin Docker Image Name you want to build> ]
@@ -29,6 +37,12 @@ make build-dev ELASTICMS_ADMIN_VERSION=5.1.2
 __Provide docker image__ : `docker.io/elasticms/admin:5.1.2-dev`
 
 # Test
+
+## Prerequisite
+
+You must install `bats`, `awscli`, `docker`, `docker-compose` and create a local network called `docker_default`.  
+
+## Test Docker images builded locally
 
 ```sh
 make test[-dev|-all] ELASTICMS_ADMIN_VERSION=<ElasticMS Admin Version you want to test>

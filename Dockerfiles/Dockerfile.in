@@ -1,0 +1,21 @@
+FROM docker.io/elasticms/base-php:8.1-apache-dev as builder
+
+include(Args.m4)
+
+include(Builder.m4)
+
+FROM docker.io/elasticms/base-php:8.1-apache as prd
+
+include(Args.m4)
+
+LABEL be.fgov.elasticms.admin.environment="prd"
+
+include(Common.m4)
+
+FROM docker.io/elasticms/base-php:8.1-apache-dev as dev
+
+include(Args.m4)
+
+LABEL be.fgov.elasticms.admin.environment="dev"
+
+include(Common.m4)

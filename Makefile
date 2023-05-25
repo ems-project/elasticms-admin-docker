@@ -5,6 +5,9 @@ ifneq (,$(wildcard ./.build.env))
     export
 endif
 
+LIB = ./Dockerfiles
+DOCKERFILE=Dockerfile.in
+
 GIT_HASH ?= $(shell git log --format="%h" -n 1)
 BUILD_DATE ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
@@ -18,7 +21,7 @@ _BUILD_ARGS_TARGET ?= prd
 _BUILD_ARGS_TAG ?= latest
 
 .DEFAULT_GOAL := help
-.PHONY: help build build-dev build-all test test-dev test-all
+.PHONY: help build build-dev build-all test test-dev test-all Dockerfile
 
 help: # Show help for each of the Makefile recipes.
 	@grep -E '^[a-zA-Z0-9 -]+:.*#'  Makefile | sort | while read -r l; do printf "\033[1;32m$$(echo $$l | cut -f 1 -d':')\033[00m:$$(echo $$l | cut -f 2- -d'#')\n"; done
@@ -38,8 +41,8 @@ _build-%:
 		-e _BUILD_ARGS_TAG="${ELASTICMS_ADMIN_VERSION}-$*" \
 		-e _BUILD_ARGS_TARGET="$*"
 
-_builder:
-	@docker build \
+_builder: _dockerfile
+	@docker build --progress=plain --no-cache \
 		--build-arg VERSION_ARG="${ELASTICMS_ADMIN_VERSION}" \
 		--build-arg RELEASE_ARG="${_BUILD_ARGS_TAG}" \
 		--build-arg BUILD_DATE_ARG="${BUILD_DATE}" \
@@ -64,3 +67,9 @@ _tester-%:
 
 _tester:
 	@bats test/tests.bats
+
+Dockerfile: # generate Dockerfile
+	@$(MAKE) -s _dockerfile
+
+_dockerfile: $(LIB)/*.m4
+	m4 -I $(LIB) $(LIB)/$(DOCKERFILE) > $(DOCKERFILE:.in=)
