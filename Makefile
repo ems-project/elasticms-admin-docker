@@ -57,7 +57,7 @@ _builder: _dockerfile
 			--tag ${DOCKER_IMAGE_NAME}:${_BUILD_ARGS_TAG} .
     else
 		@echo "Building $(CONTAINER_TARGET_IMAGE_FORMAT) image format with docker"
-		@docker build --no-cache --pull-always --force-rm \
+		@docker build --no-cache --force-rm --progress=plain \
 			--build-arg VERSION_ARG="${ELASTICMS_ADMIN_VERSION}" \
 			--build-arg RELEASE_ARG="${_BUILD_ARGS_TAG}" \
 			--build-arg BUILD_DATE_ARG="${BUILD_DATE}" \
