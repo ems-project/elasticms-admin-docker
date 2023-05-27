@@ -58,6 +58,12 @@ You can also run `make help` to see a list of available commands.
 
 Using an environment variable allows you to dynamically switch between Docker and Podman with Buildah without modifying the `.build.env` file.
 
+Additionally, if you are using Podman as the container engine, you can specify the `CONTAINER_TARGET_IMAGE_FORMAT` environment variable to choose the image format. By default, the image format is Docker. To create the image in the OCI format, use the following command:
+
+   ```bash
+   make build CONTAINER_ENGINE=podman CONTAINER_TARGET_IMAGE_FORMAT=oci
+   ```
+
 To customize the Docker image name and ElasticMS Admin version, you have two options:
 
 1. Set the `DOCKER_IMAGE_NAME` and `ELASTICMS_ADMIN_VERSION` variables in the `.build.env` file. Create a `.build.env` file in the repository directory and define the desired values for these variables.
@@ -68,6 +74,7 @@ To customize the Docker image name and ElasticMS Admin version, you have two opt
    ```
 
 Setting these variables allows you to customize the image name and ElasticMS Admin version without modifying the `.build.env` file.
+
 
 Please ensure that you have the necessary dependencies installed as mentioned earlier in the documentation.
 
