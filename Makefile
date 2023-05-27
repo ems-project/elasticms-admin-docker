@@ -15,7 +15,10 @@ BUILD_DATE ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 ELASTICMS_ADMIN_VERSION ?= 5.0.0
 
 # Default Docker image name (if no .build.env file provided)
-DOCKER_IMAGE_NAME ?= docker.io/elasticms/cli
+DOCKER_IMAGE_NAME ?= docker.io/elasticms/admin
+
+CONTAINER_ENGINE ?= docker
+CONTAINER_TARGET_IMAGE_FORMAT ?= docker
 
 _BUILD_ARGS_TARGET ?= prd
 _BUILD_ARGS_TAG ?= latest
@@ -42,13 +45,26 @@ _build-%:
 		-e _BUILD_ARGS_TARGET="$*"
 
 _builder: _dockerfile
-	@docker build --progress=plain --no-cache \
-		--build-arg VERSION_ARG="${ELASTICMS_ADMIN_VERSION}" \
-		--build-arg RELEASE_ARG="${_BUILD_ARGS_TAG}" \
-		--build-arg BUILD_DATE_ARG="${BUILD_DATE}" \
-		--build-arg VCS_REF_ARG="${GIT_HASH}" \
-		--target ${_BUILD_ARGS_TARGET} \
-		--tag ${DOCKER_IMAGE_NAME}:${_BUILD_ARGS_TAG} .
+    ifeq ($(CONTAINER_ENGINE),podman)
+		@echo "Building $(CONTAINER_TARGET_IMAGE_FORMAT) image format with buildah"
+		@buildah bud --no-cache --pull-always --force-rm --squash \
+			--build-arg VERSION_ARG="${ELASTICMS_ADMIN_VERSION}" \
+			--build-arg RELEASE_ARG="${_BUILD_ARGS_TAG}" \
+			--build-arg BUILD_DATE_ARG="${BUILD_DATE}" \
+			--build-arg VCS_REF_ARG="${GIT_HASH}" \
+			--format ${CONTAINER_TARGET_IMAGE_FORMAT} \
+			--target ${_BUILD_ARGS_TARGET} \
+			--tag ${DOCKER_IMAGE_NAME}:${_BUILD_ARGS_TAG} .
+    else
+		@echo "Building $(CONTAINER_TARGET_IMAGE_FORMAT) image format with docker"
+		@docker build --no-cache --pull-always --force-rm \
+			--build-arg VERSION_ARG="${ELASTICMS_ADMIN_VERSION}" \
+			--build-arg RELEASE_ARG="${_BUILD_ARGS_TAG}" \
+			--build-arg BUILD_DATE_ARG="${BUILD_DATE}" \
+			--build-arg VCS_REF_ARG="${GIT_HASH}" \
+			--target ${_BUILD_ARGS_TARGET} \
+			--tag ${DOCKER_IMAGE_NAME}:${_BUILD_ARGS_TAG} .
+    endif
 
 test: # Test [elasticms-admin] [prd] variant Docker images
 	@$(MAKE) -s _tester-prd
@@ -61,9 +77,11 @@ test-all: # Test [elasticms-admin] [prd,dev] variant Docker images
 	@$(MAKE) -s _tester-dev
 
 _tester-%: 
+	@echo "Test image with $(CONTAINER_ENGINE) container engine"
 	@$(MAKE) -s _tester \
 		-e DOCKER_IMAGE_NAME="${DOCKER_IMAGE_NAME}:${ELASTICMS_ADMIN_VERSION}-$*" \
-		-e EMS_VERSION="${ELASTICMS_ADMIN_VERSION}"
+		-e EMS_VERSION="${ELASTICMS_ADMIN_VERSION}" \
+		-e CONTAINER_ENGINE="${CONTAINER_ENGINE}"
 
 _tester:
 	@bats test/tests.bats
