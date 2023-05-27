@@ -90,4 +90,4 @@ Dockerfile: # generate Dockerfile
 	@$(MAKE) -s _dockerfile
 
 _dockerfile: $(LIB)/*.m4
-	m4 -I $(LIB) $(LIB)/$(DOCKERFILE) > $(DOCKERFILE:.in=)
+	sed -e 's/# include(\(.*\))/include(\1)/g' $(LIB)/$(DOCKERFILE) | m4 -I $(LIB) > $(DOCKERFILE:.in=)
