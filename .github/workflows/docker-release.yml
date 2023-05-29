@@ -137,7 +137,7 @@ jobs:
           chmod 777 test/demo/skeleton
 
       - name: Setup BATS testing framework
-        uses: mig4/setup-bats@v1
+        uses: zebby76/setup-bats@v1
         with:
           bats-version: 1.2.1
 
