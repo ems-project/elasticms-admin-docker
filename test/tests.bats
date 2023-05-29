@@ -44,8 +44,8 @@ export BATS_ELASTICMS_ADMIN_PASSWORD="bats"
 export BATS_ELASTICMS_ADMIN_EMAIL="demo.admin.s3.bats@example.com"
 export BATS_ELASTICMS_ADMIN_ENVIRONMENT="demo-dev"
 
-export BATS_ELASTICMS_SKELETON_ADMIN_URL="http://demo-admin.localhost"
-export BATS_ELASTICMS_SKELETON_BACKEND_URL="http://demo-admin-dev.localhost:9000"
+export BATS_ELASTICMS_SKELETON_ADMIN_URL="http://demo-admin"
+export BATS_ELASTICMS_SKELETON_BACKEND_URL="http://demo-admin-dev:9000"
 export BATS_ELASTICMS_SKELETON_ENVIRONMENT="demo-preview-dev"
 
 export BATS_STORAGE_SERVICE_NAME="postgresql"
