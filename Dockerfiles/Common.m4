@@ -11,8 +11,8 @@ LABEL be.fgov.elasticms.admin.build-date=$BUILD_DATE_ARG \
 
 USER root
 
-COPY bin/ /opt/bin/
-COPY etc/ /usr/local/etc/
+COPY --chown=1001:0 --chmod=770 etc/ /usr/local/etc/
+COPY --chown=1001:0 --chmod=750 bin/ /opt/bin/
 
 COPY --from=builder /opt/src /opt/src
 

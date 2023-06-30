@@ -1,0 +1,8 @@
+[eventlistener:ems-jobs-{{ env.Getenv "ELASTICMS_ADMIN_INSTANCE_NAME" }}]
+command=/opt/bin/supervisor-event-listener.py /opt/bin/ems-jobs/{{ env.Getenv "ELASTICMS_ADMIN_INSTANCE_NAME" }}
+events=TICK_60
+autorestart=false
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0

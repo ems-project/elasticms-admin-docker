@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+export AWS_S3_ENDPOINT_URL="${AWS_S3_ENDPOINT_URL:-}"
+
+if [ -n "$AWS_S3_ENDPOINT_URL" ]; then
+  AWS_CLI_EXTRA_ARGS="--endpoint-url ${AWS_S3_ENDPOINT_URL}"
+fi
+
+export AWS_CLI_EXTRA_ARGS="${AWS_CLI_EXTRA_ARGS:-}"
+
+export ELASTICMS_ADMIN_ENV_FILES_ARR=()
+export ELASTICMS_ADMIN_ENV_FILES="${ELASTICMS_ADMIN_ENV_FILES_ARR[*]}"
+
+true
