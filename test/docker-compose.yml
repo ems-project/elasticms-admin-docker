@@ -111,10 +111,8 @@ services:
     networks:
       default:
         aliases:
-          - demo-admin
-          - demo-admin-dev
-          - demo-pgsql-admin
-          - demo-pgsql-admin-dev
+          - local.ems-demo-admin
+          - local.ems-demo-admin-dev
     container_name: ems
     ports:
       - 9000:9000
@@ -130,7 +128,8 @@ services:
       - PHP_FPM_REQUEST_MAX_MEMORY_IN_MEGABYTES=${BATS_PHP_FPM_REQUEST_MAX_MEMORY_IN_MEGABYTES}
       - CONTAINER_HEAP_PERCENT=${BATS_CONTAINER_HEAP_PERCENT}
       - ES_ENDPOINT_URL=${BATS_ES_LOCAL_ENDPOINT_URL}
-      - TIKA_ENDPOINT_URL=${BATS_TIKA_LOCAL_ENDPOINT_URL}
+      - TIKA_SERVER=${BATS_TIKA_LOCAL_ENDPOINT_URL}
+      - MAILER_URL=smtp://null
       - DB_DRIVER=${BATS_DB_DRIVER}
       - DB_HOST=${BATS_DB_HOST}
       - DB_PORT=${BATS_DB_PORT}
@@ -159,7 +158,7 @@ services:
       - PHP_FPM_MAX_CHILDREN=8
       - PHP_FPM_REQUEST_MAX_MEMORY_IN_MEGABYTES=64
       - CONTAINER_HEAP_PERCENT=0.8
-      - ES_ENDPOINT_URL=${BATS_ES_LOCAL_ENDPOINT_URL}
+      - 'EMS_ELASTICSEARCH_HOSTS=["http://es01:9200","http://es02:9200","http://es03:9200"]'
       - MAILER_URL=null://null
       - REDIS_HOST=${BATS_REDIS_HOST}
       - REDIS_PORT=${BATS_REDIS_PORT}
@@ -167,6 +166,7 @@ services:
       - EMSCH_ASSET_LOCAL_FOLDER="skeleton"
       - BACKEND_URL=${BATS_ELASTICMS_SKELETON_BACKEND_URL}
       - ADMIN_URL=${BATS_ELASTICMS_SKELETON_ADMIN_URL}
+      - EMS_BACKEND_URL=${BATS_ELASTICMS_SKELETON_BACKEND_URL}
       - VARNISH_ENABLED=true
     volumes:
       - ./demo/configs/admin:/opt/src/admin

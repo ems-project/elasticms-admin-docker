@@ -11,17 +11,19 @@ function configure_database {
   local -r _DB_USER=${8}
   local -r _DB_PASSWORD=${9}
   local -r _DB_NAME=${10}
+  local -r _DB_SCHEMA=${11}
 
   if [ ${_DB_DRIVER} = mysql ] ; then
     configure_mysql ${_container_name} ${_DB_ROOT_USER} ${_DB_ROOT_PASSWORD} ${_DB_ROOT_NAME} ${_DB_PORT} ${_DB_HOST} ${_DB_USER} ${_DB_PASSWORD} ${_DB_NAME}
   elif [ ${_DB_DRIVER} = pgsql ] ; then
-    configure_pgsql ${_container_name} ${_DB_ROOT_USER} ${_DB_ROOT_PASSWORD} ${_DB_ROOT_NAME} ${_DB_PORT} ${_DB_HOST} ${_DB_USER} ${_DB_PASSWORD} ${_DB_NAME}
+    configure_pgsql ${_container_name} ${_DB_ROOT_USER} ${_DB_ROOT_PASSWORD} ${_DB_ROOT_NAME} ${_DB_PORT} ${_DB_HOST} ${_DB_USER} ${_DB_PASSWORD} ${_DB_NAME} ${_DB_SCHEMA}
   else
     echo "Driver ${_DB_DRIVER} not supported"
     return -1
   fi;
 
 }
+
 
 function configure_mysql {
   local -r _container_name=${1}
@@ -62,12 +64,22 @@ function configure_pgsql {
   local -r _DB_USER=${7}
   local -r _DB_PASSWORD=${8}
   local -r _DB_NAME=${9}
+  local -r _DB_SCHEMA=${10}
 
   run ${BATS_CONTAINER_ENGINE} exec ${_container_name} sh -c "PGHOST=${_DB_HOST} PGPORT=${_DB_PORT} PGDATABASE=${_DB_ROOT_NAME} PGUSER=${_DB_ROOT_USER} PGPASSWORD=${_DB_ROOT_PASSWORD} psql --command=\"CREATE USER ${_DB_USER} WITH PASSWORD '${_DB_PASSWORD}';\""
   assert_output -l -r "CREATE ROLE"
-  
+
   run ${BATS_CONTAINER_ENGINE} exec ${_container_name} sh -c "PGHOST=${_DB_HOST} PGPORT=${_DB_PORT} PGDATABASE=${_DB_ROOT_NAME} PGUSER=${_DB_ROOT_USER} PGPASSWORD=${_DB_ROOT_PASSWORD} psql --command=\"CREATE DATABASE ${_DB_NAME} WITH OWNER ${_DB_USER};\""
   assert_output -l -r "CREATE DATABASE"
+
+  run ${BATS_CONTAINER_ENGINE} exec ${_container_name} sh -c "PGHOST=${_DB_HOST} PGPORT=${_DB_PORT} PGDATABASE=${_DB_ROOT_NAME} PGUSER=${_DB_ROOT_USER} PGPASSWORD=${_DB_ROOT_PASSWORD} psql --command=\"GRANT ALL PRIVILEGES ON DATABASE ${_DB_NAME} TO ${_DB_USER};\""
+  assert_output -l -r "GRANT"
+
+  run ${BATS_CONTAINER_ENGINE} exec ${_container_name} sh -c "PGHOST=${_DB_HOST} PGPORT=${_DB_PORT} PGDATABASE=${_DB_NAME} PGUSER=${_DB_USER} PGPASSWORD='${_DB_PASSWORD}' psql --command=\"CREATE SCHEMA IF NOT EXISTS ${_DB_SCHEMA} AUTHORIZATION ${_DB_USER};\""
+  assert_output -l -r "CREATE SCHEMA"
+
+  run ${BATS_CONTAINER_ENGINE} exec ${_container_name} sh -c "PGHOST=${_DB_HOST} PGPORT=${_DB_PORT} PGDATABASE=${_DB_NAME} PGUSER=${_DB_USER} PGPASSWORD='${_DB_PASSWORD}' psql --command=\"ALTER USER ${_DB_USER} SET SEARCH_PATH TO ${_DB_SCHEMA};\""
+  assert_output -l -r "ALTER ROLE"
 
 }
 

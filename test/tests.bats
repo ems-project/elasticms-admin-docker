@@ -16,6 +16,7 @@ export BATS_DB_PORT="${BATS_DB_PORT:-5432}"
 export BATS_DB_USER="${BATS_DB_USER:-example_adm}"
 export BATS_DB_PASSWORD="${BATS_DB_PASSWORD:-abcd@.<efgh>.}"
 export BATS_DB_NAME="${BATS_DB_NAME:-example}"
+export BATS_DB_SCHEMA_NAME="${BATS_DB_SCHEMA_NAME:-schema_example_adm}"
 
 export BATS_REDIS_HOST="${BATS_REDIS_HOST:-redis}"
 export BATS_REDIS_PORT="${BATS_REDIS_PORT:-6379}"
@@ -42,11 +43,11 @@ export BATS_CONTAINER_HEAP_PERCENT="${BATS_CONTAINER_HEAP_PERCENT:-0.80}"
 export BATS_ELASTICMS_ADMIN_USERNAME="demo-bats"
 export BATS_ELASTICMS_ADMIN_PASSWORD="bats"
 export BATS_ELASTICMS_ADMIN_EMAIL="demo.admin.s3.bats@example.com"
-export BATS_ELASTICMS_ADMIN_ENVIRONMENT="demo-dev"
+export BATS_ELASTICMS_ADMIN_ENVIRONMENT="ems-demo-dev"
 
-export BATS_ELASTICMS_SKELETON_ADMIN_URL="http://demo-admin"
-export BATS_ELASTICMS_SKELETON_BACKEND_URL="http://demo-admin-dev:9000"
-export BATS_ELASTICMS_SKELETON_ENVIRONMENT="demo-preview-dev"
+export BATS_ELASTICMS_SKELETON_ADMIN_URL="http://local.ems-demo-admin"
+export BATS_ELASTICMS_SKELETON_BACKEND_URL="http://local.ems-demo-admin:9000"
+export BATS_ELASTICMS_SKELETON_ENVIRONMENT="preview"
 
 export BATS_STORAGE_SERVICE_NAME="postgresql"
 
@@ -110,7 +111,7 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Configure Database." {
 
-  configure_database ${BATS_STORAGE_SERVICE_NAME} ${BATS_DB_DRIVER} ${BATS_ROOT_DB_USER} ${BATS_ROOT_DB_PASSWORD} ${BATS_ROOT_DB_NAME} ${BATS_DB_PORT} ${BATS_DB_HOST} ${BATS_DB_USER} ${BATS_DB_PASSWORD} ${BATS_DB_NAME}
+  configure_database ${BATS_STORAGE_SERVICE_NAME} ${BATS_DB_DRIVER} ${BATS_ROOT_DB_USER} ${BATS_ROOT_DB_PASSWORD} ${BATS_ROOT_DB_NAME} ${BATS_DB_PORT} ${BATS_DB_HOST} ${BATS_DB_USER} ${BATS_DB_PASSWORD} ${BATS_DB_NAME} ${BATS_DB_SCHEMA_NAME}
 
 }
 
@@ -139,6 +140,7 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 }
 
 @test "[$TEST_FILE] Starting Elasticms." {
+  export BATS_DB_HOST=$(container_ip postgresql)
   export BATS_ES_LOCAL_ENDPOINT_URL=http://$(container_ip es01):9200
   export BATS_S3_ENDPOINT_URL=http://$(container_ip minio):9000
   export BATS_TIKA_LOCAL_ENDPOINT_URL=http://$(container_ip tika):9998
@@ -153,10 +155,10 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
   for file in ${BATS_TEST_DIRNAME%/}/configs/elasticms/*.env ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
-    container_wait_for_log ems 60 "Install \[ ${_name} \] CMS Domain from S3 Bucket \[ ${_basename} \] file successfully ..."
-    container_wait_for_log ems 60 "Doctrine database migration for \[ ${_name} \] CMS Domain run successfully ..."
-    container_wait_for_log ems 60 "Elasticms assets installation for \[ ${_name} \] CMS Domain run successfully ..."
-    container_wait_for_log ems 60 "Elasticms warming up for \[ ${_name} \] CMS Domain run successfully ..."
+    container_wait_for_log ems 60 "Install \[ /tmp/${_name} \] ElasticMS Admin .env file from S3 Bucket \[ ${_basename} \] file ..."
+    container_wait_for_log ems 60 "Doctrine database migration run successfully for ElasticMS Admin instance \[ ${_name} \] ..."
+    container_wait_for_log ems 60 "Elasticms assets installation run successfully for ElasticMS Admin instance \[ ${_name} \] ..."
+    container_wait_for_log ems 60 "Elasticms warming up run successfully for ElasticMS Admin instance \[ ${_name} \] ..."
   done
 
   container_wait_for_log ems 60 "NOTICE: ready to handle connections"
@@ -212,7 +214,7 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 @test "[$TEST_FILE] Login to Elasticms for configuration." {
 
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:login --username=${BATS_ELASTICMS_ADMIN_USERNAME} --password=${BATS_ELASTICMS_ADMIN_PASSWORD} ${BATS_ELASTICMS_SKELETON_BACKEND_URL}
-  assert_output -r ".*\[OK\] Welcome ${BATS_ELASTICMS_ADMIN_USERNAME} on ${BATS_ELASTICMS_BACKEND_URL}"
+  assert_output -r ".*\[OK\] Welcome ${BATS_ELASTICMS_ADMIN_USERNAME} on ${BATS_ELASTICMS_SKELETON_BACKEND_URL}"
 
 }
 
