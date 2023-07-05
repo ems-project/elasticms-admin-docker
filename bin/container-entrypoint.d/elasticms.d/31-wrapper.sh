@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo -e "\n- Configure ElasticMS Wrapper scripts ..."
-
 # This function uses () to fork a new process and isolate the environment variables.
 # The purpose of forking a new process is to prevent unintended changes to the environment variables used within the function.
 # By isolating the variables, we ensure that any modifications made inside the function do not affect the parent process or other functions.
@@ -21,16 +19,8 @@ function create-wrapper-scripts (
 
   chmod a+x /opt/bin/${_NAME}
 
-  echo -e "  ElasticMS Admin instance [ ${_NAME} ] wrapper script created successfully ..."
+  echo -e "  Wrapper script created successfully ..."
 
 )
-
-for FILE in ${ELASTICMS_ADMIN_ENV_FILES}; do
-
-  _FILENAME=$(basename "${FILE}")
-
-  create-wrapper-scripts "${FILE}" "${_FILENAME%.*}"
-
-done
 
 true

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo -e "\n- Configure ElasticMS Jobs ..."
-
 # This function uses () to fork a new process and isolate the environment variables.
 # The purpose of forking a new process is to prevent unintended changes to the environment variables used within the function.
 # By isolating the variables, we ensure that any modifications made inside the function do not affect the parent process or other functions.
@@ -31,21 +29,8 @@ function configure-elasticms-jobs (
 
   chmod a+x /opt/bin/ems-jobs/${_NAME}
 
-  echo -e "  ElasticMS Admin instance [ ${_NAME} ] Supervisor Event Listener configuration file [ ${_NAME} ] created successfully ..."
+  echo -e "  Supervisor Event Listener configured successfully ..."
 
 )
-
-for FILE in ${ELASTICMS_ADMIN_ENV_FILES}; do
-
-  _FILENAME=$(basename "${FILE}")
-
-  if [ -z "${JOBS_ENABLED}" ] || [ "${JOBS_ENABLED}" != "true" ]; then
-    echo -e "  Use PHP-FPM for running EMS Jobs ..."
-  else
-    echo -e "  Use Supervisor Events Listener for running EMS Jobs ..."
-    configure-elasticms-jobs "${FILE}" "${_FILENAME%.*}"
-  fi
-
-done
 
 true

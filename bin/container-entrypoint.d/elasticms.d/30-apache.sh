@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo -e "\n- Configure ElasticMS Admin Apache <VirtualHost> ..."
-
 # This function uses () to fork a new process and isolate the environment variables.
 # The purpose of forking a new process is to prevent unintended changes to the environment variables used within the function.
 # By isolating the variables, we ensure that any modifications made inside the function do not affect the parent process or other functions.
@@ -46,19 +44,12 @@ function create-apache-vhost (
       -f /usr/local/etc/templates/elasticms-admin-metrics.vhost.conf.tmpl \
       -o /etc/apache2/conf.d/__metrics.conf
     
-    echo -e "  ElasticMS Admin instance [ ${_NAME} ] ( Prometheus Metrics ) configured successfully ..."
+    echo -e "  Apache VirtualHost ( Prometheus Metrics ) configured successfully ..."
 
   fi
 
-  echo -e "  ElasticMS Admin instance [ ${_NAME} ] ( ${SERVER_NAME} ) configured successfully ..."
+  echo -e "  Apache VirtualHost ( ${SERVER_NAME} ) configured successfully ..."
 
 )
-
-for FILE in ${ELASTICMS_ADMIN_ENV_FILES}; do
-
-  _FILENAME=$(basename "${FILE}")
-  create-apache-vhost "${FILE}" "${_FILENAME%.*}"
-
-done
 
 true

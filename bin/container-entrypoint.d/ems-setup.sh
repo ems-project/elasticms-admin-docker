@@ -4,7 +4,7 @@ set -eo pipefail
 export DEBUG=${DEBUG:-false}
 [[ "${DEBUG}" == "true" ]] && set -x
 
-echo -e "\nConfigure ElasticMS Admin Container"
+echo -e "\n## —— Configure ElasticMS Admin Container ——————————————————————————————————————"
 
 for FILE in $(find /opt/bin/container-entrypoint.d/entrypoint.d -iname \*.sh | sort)
 do
@@ -16,4 +16,5 @@ do
   source ${FILE}
 done
 
-echo -e "\nElasticMS Admin Container configured succesfully"
+echo -e "\n## —— ElasticMS Admin Container configured succesfully —————————————————————————"
+echo -e "\n"

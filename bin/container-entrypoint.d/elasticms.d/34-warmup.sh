@@ -1,6 +1,50 @@
 #!/usr/bin/env bash
 
-echo -e "\n- Warming Up ElasticMS Admin ..."
+function elasticms-command {
+
+  local -r _EMS_INSTANCE=$1
+  local -r _EMS_COMMAND=$2
+
+  export LOG_TMP_FILE=$(mktemp)
+
+  echo -e "\n  Running command: '/opt/bin/${_EMS_INSTANCE} ${_EMS_COMMAND}' ..."
+
+  /opt/bin/${_EMS_INSTANCE} ${_EMS_COMMAND} > "${LOG_TMP_FILE}" 2>&1
+
+  if [ $? -eq 0 ]; then
+    echo -e "  Command '/opt/bin/${_EMS_INSTANCE} ${_EMS_COMMAND}' executed successfully."
+    [[ "${APP_ENV}" == "dev" ]] && displayLog
+  else
+    echo -e "  Warning: something doesn't work with command: '/opt/bin/${_EMS_INSTANCE} ${_EMS_COMMAND}' !"
+    echo -e "  -- OUTPUT COMMAND --"
+    displayLog
+  fi
+
+  rm ${LOG_TMP_FILE}
+
+}
+
+function change-database-state {
+
+  local -r _ACTION=$1
+  local _STORED_PROCEDURE_QUERY="select * from ${_ACTION}_dbcr();"
+
+  export LOG_TMP_FILE=$(mktemp)
+
+  psql postgresql://${DB_USER}:$(urlencode.py $DB_PASSWORD)@${DB_HOST//,/:${DB_PORT},}:${DB_PORT}/${DB_NAME}?connect_timeout=${DB_CONNECTION_TIMEOUT:-30} -c "${_STORED_PROCEDURE_QUERY}" > "${LOG_TMP_FILE}" 2>&1
+
+  if [ $? -eq 0 ]; then
+    echo -e "  Postgres procedure ${_ACTION}_dbcr() executed successfully."
+    [[ "${APP_ENV}" == "dev" ]] && displayLog
+  else
+    echo -e "  Warning: something doesn't work with Postgres procedure: '${_ACTION}_dbcr()' !"
+    echo -e "  -- OUTPUT COMMAND --"
+    displayLog
+  fi
+
+  rm ${LOG_TMP_FILE}
+
+}
 
 # This function uses () to fork a new process and isolate the environment variables.
 # The purpose of forking a new process is to prevent unintended changes to the environment variables used within the function.
@@ -15,71 +59,28 @@ function elasticms-warmup (
 
   export ELASTICMS_ADMIN_INSTANCE_NAME="${_NAME}"
 
-  echo -e "\n  Warming Up ElasticMS Admin instance [ ${_NAME} ] ..."
-
   if [[ "$DB_DRIVER" =~ ^.*pgsql$ ]]; then
     if [[ "$DB_USER" =~ ^.*_(chg)$ ]]; then
-      echo -e "\n  Call start_dbcr() Postgres procedure [ ${_NAME} ] ..."
-      psql postgresql://${DB_USER}:$(urlencode.py $DB_PASSWORD)@${DB_HOST//,/:${DB_PORT},}:${DB_PORT}/${DB_NAME}?connect_timeout=${DB_CONNECTION_TIMEOUT:-30} -c 'select * from start_dbcr();'
+      change-database-state "start"
     fi
   fi
 
-  echo -e "\n  Running Doctrine database migration (sync-metadata-storage) ..."
-  /opt/bin/${_NAME} doctrine:migrations:sync-metadata-storage --no-interaction --env=prod
-  if [ $? -eq 0 ]; then
-    echo -e "  Doctrine sync metadata storage run successfully ..."
-  else
-    echo -e "  Warning: something doesn't work with doctrine sync metadata  !"
-  fi
-
-  echo -e "\n  Running Doctrine database migration ..."
-  /opt/bin/${_NAME} doctrine:migrations:migrate --no-interaction --env=prod
-  if [ $? -eq 0 ]; then
-    echo -e "  Doctrine database migration run successfully for ElasticMS Admin instance [ ${_NAME} ] ..."
-  else
-    echo -e "  Warning: something doesn't work with Doctrine database migration !"
-  fi
+  elasticms-command "${ELASTICMS_ADMIN_INSTANCE_NAME}" "doctrine:migrations:sync-metadata-storage --no-interaction --env=prod"
+  elasticms-command "${ELASTICMS_ADMIN_INSTANCE_NAME}" "doctrine:migrations:migrate --no-interaction --env=prod"
 
   if [[ "$DB_DRIVER" =~ ^.*pgsql$ ]]; then
     if [[ "$DB_USER" =~ ^.*_(chg)$ ]]; then
-      echo -e "  Call stop_dbcr() Postgres procedure ..."
-      psql postgresql://${DB_USER}:$(urlencode.py $DB_PASSWORD)@${DB_HOST//,/:${DB_PORT},}:${DB_PORT}/${DB_NAME}?connect_timeout=${DB_CONNECTION_TIMEOUT:-30} -c 'select * from stop_dbcr();'
+      change-database-state "stop"
     fi
   fi
 
-  echo -e "\n  Running Elasticms assets installation to /opt/src/public folder ..."
-  /opt/bin/${_NAME} asset:install /opt/src/public --symlink --no-interaction --env=prod
-  if [ $? -eq 0 ]; then
-    echo -e "  Elasticms assets installation run successfully for ElasticMS Admin instance [ ${_NAME} ] ..."
-  else
-    echo -e "  Warning: something doesn't work with Elasticms assets installation !"
-  fi
-
-  echo -e "\n  Running Elasticms cache warming up ..."
-  /opt/bin/${_NAME} cache:warm --no-interaction --env=prod
-  if [ $? -eq 0 ]; then
-    echo -e "  Elasticms warming up run successfully for ElasticMS Admin instance [ ${_NAME} ] ..."
-  else
-    echo -e "  Warning: something doesn't work with Elasticms cache warming up !"
-  fi
+  elasticms-command "${ELASTICMS_ADMIN_INSTANCE_NAME}" "asset:install /opt/src/public --symlink --no-interaction --env=prod"
+  elasticms-command "${ELASTICMS_ADMIN_INSTANCE_NAME}" "cache:warm --no-interaction --env=prod"
 
   if [[ ! -z ${EMS_METRIC_ENABLED} ]] && [[ ${EMS_METRIC_ENABLED,,} = true ]]; then
-    echo -e "\n  [ ${_NAME} ] Clear Elasticms metrics ..."
-    /opt/bin/${_NAME} ems:metric:collect --clear
-    if [ $? -eq 0 ]; then
-      echo -e "  Clear Elasticms metrics run successfully ..."
-    else
-      echo -e "  Warning: something doesn't work with Elasticms metrics clearing !"
-    fi
+    elasticms-command "${ELASTICMS_ADMIN_INSTANCE_NAME}" "ems:metric:collect --clear"
   fi
 
 )
-
-for FILE in ${ELASTICMS_ADMIN_ENV_FILES}; do
-
-  _FILENAME=$(basename "${FILE}")
-  elasticms-warmup "${FILE}" "${_FILENAME%.*}"
-
-done
 
 true
