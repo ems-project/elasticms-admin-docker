@@ -55,8 +55,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-    ports:
-      - 9200:9200
     networks:
       - default
     mem_limit: 1024m
@@ -108,15 +106,7 @@ services:
 
   elasticms:
     image: ${BATS_DOCKER_IMAGE_NAME}
-    networks:
-      default:
-        aliases:
-          - local.ems-demo-admin
-          - local.ems-demo-admin-dev
     container_name: ems
-    ports:
-      - 9000:9000
-      - 9090:9090
     environment:
       - AWS_S3_STORAGE_BUCKET_NAME=${BATS_S3_STORAGE_BUCKET_NAME}
       - AWS_S3_CONFIG_BUCKET_NAME=${BATS_S3_ELASTICMS_CONFIG_BUCKET_NAME}
