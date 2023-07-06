@@ -149,13 +149,14 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Check Elasticms startup messages in container logs." {
 
-  for file in ${BATS_TEST_DIRNAME%/}/configs/elasticms/*.env ; do
+  for file in ${BATS_TEST_DIRNAME%/}/demo/configs/elasticms-admin/*.env ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
-    container_wait_for_log ems 60 "Install \[ /tmp/${_name} \] ElasticMS Admin .env file from S3 Bucket \[ ${_basename} \] file ..."
-    container_wait_for_log ems 60 "Doctrine database migration run successfully for ElasticMS Admin instance \[ ${_name} \] ..."
-    container_wait_for_log ems 60 "Elasticms assets installation run successfully for ElasticMS Admin instance \[ ${_name} \] ..."
-    container_wait_for_log ems 60 "Elasticms warming up run successfully for ElasticMS Admin instance \[ ${_name} \] ..."
+    container_wait_for_log ems 60 "Setting Up \[ ${_name} \] ElasticMS Admin instance ..."
+    container_wait_for_log ems 60 "Command '/opt/bin/${_name} doctrine:migrations:sync-metadata-storage .*' executed successfully."
+    container_wait_for_log ems 60 "Command '/opt/bin/${_name} doctrine:migrations:migrate .*' executed successfully."
+    container_wait_for_log ems 60 "Command '/opt/bin/${_name} asset:install /opt/src/public --symlink .*' executed successfully."
+    container_wait_for_log ems 60 "Command '/opt/bin/${_name} cache:warm .*' executed successfully."
   done
 
   container_wait_for_log ems 60 "NOTICE: ready to handle connections"
@@ -513,7 +514,7 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Check for Elasticms status page response code 200 for all configured domains" {
 
-  for file in ${BATS_TEST_DIRNAME%/}/configs/elasticms/*.env ; do
+  for file in ${BATS_TEST_DIRNAME%/}/demo/configs/elasticms-admin/*.env ; do
 
     _basename=$(basename $file)
     _name=${_basename%.*}
@@ -535,7 +536,7 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Check for Elasticms metrics page response code 200 for all configured domains" {
 
-  for file in ${BATS_TEST_DIRNAME%/}/configs/elasticms/*.env ; do
+  for file in ${BATS_TEST_DIRNAME%/}/demo/configs/elasticms-admin/*.env ; do
 
     _basename=$(basename $file)
     _name=${_basename%.*}
