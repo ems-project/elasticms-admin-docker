@@ -3,7 +3,7 @@ version: "2.4"
 services:
 
   minio:
-    image: minio/minio
+    image: docker.io/minio/minio:latest
     container_name: minio
     ports:
       - 19000:9000
@@ -58,6 +58,7 @@ services:
     networks:
       - default
     mem_limit: 1024m
+
   es02:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
     container_name: es02
@@ -77,6 +78,7 @@ services:
     networks:
       - default
     mem_limit: 1024m
+
   es03:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
     container_name: es03
@@ -98,7 +100,7 @@ services:
     mem_limit: 1024m
 
   redis:
-    image: centos/redis-5-centos7
+    image: docker.io/centos/redis-5-centos7
     container_name: redis
     networks:
       - default
