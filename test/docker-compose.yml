@@ -135,38 +135,6 @@ services:
     command: ["wait-for-it", "${BATS_DB_HOST}:${BATS_DB_PORT}", "--", "/usr/bin/supervisord", "-c", "/etc/supervisord/supervisord.conf"]
     mem_limit: 512m
 
-  emsch:
-    image: docker.io/elasticms/website-skeleton:5
-    container_name: emsch
-    environment:
-      - APP_ENV=dev
-      - AWS_S3_STORAGE_BUCKET_NAME=${BATS_S3_STORAGE_BUCKET_NAME}
-      - AWS_S3_CONFIG_BUCKET_NAME=${BATS_S3_SKELETON_CONFIG_BUCKET_NAME}
-      - AWS_S3_ENDPOINT_URL=${BATS_S3_ENDPOINT_URL}
-      - AWS_ACCESS_KEY_ID=${BATS_S3_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${BATS_S3_SECRET_ACCESS_KEY}
-      - AWS_DEFAULT_REGION=${BATS_S3_DEFAULT_REGION}
-      - PHP_FPM_MAX_CHILDREN=8
-      - PHP_FPM_REQUEST_MAX_MEMORY_IN_MEGABYTES=64
-      - CONTAINER_HEAP_PERCENT=0.8
-      - 'EMS_ELASTICSEARCH_HOSTS=["http://es01:9200","http://es02:9200","http://es03:9200"]'
-      - MAILER_URL=null://null
-      - REDIS_HOST=${BATS_REDIS_HOST}
-      - REDIS_PORT=${BATS_REDIS_PORT}
-      - ENVIRONMENT_ALIAS_BASE_PATH="../"
-      - EMSCH_ASSET_LOCAL_FOLDER="skeleton"
-      - BACKEND_URL=${BATS_ELASTICMS_SKELETON_BACKEND_URL}
-      - ADMIN_URL=${BATS_ELASTICMS_SKELETON_ADMIN_URL}
-      - EMS_BACKEND_URL=${BATS_ELASTICMS_SKELETON_BACKEND_URL}
-      - VARNISH_ENABLED=true
-    volumes:
-      - ./demo/configs/admin:/opt/src/admin
-      - ./demo/configs/document:/opt/src/document
-      - ./demo/dist:/opt/src/public/skeleton:ro
-      - ./demo/skeleton:/opt/src/local/demo_pgsql_v1_preview
-      - ./demo/skeleton:/opt/src/local/demo_pgsql_v1_live
-    mem_limit: 512m
-
 networks:
   default:
     external:
