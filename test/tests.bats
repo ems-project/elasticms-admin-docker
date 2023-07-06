@@ -137,7 +137,8 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Starting Elasticms." {
   export BATS_DB_HOST=$(container_ip postgresql)
-  export BATS_ES_LOCAL_ENDPOINT_URL=http://$(container_ip es01):9200
+
+  export BATS_EMS_ELASTICSEARCH_HOSTS="[\"http://$(container_ip es01):9200\",\"http://$(container_ip es02):9200\",\"http://$(container_ip es03):9200\"]"
   export BATS_S3_ENDPOINT_URL=http://$(container_ip minio):9000
   export BATS_TIKA_LOCAL_ENDPOINT_URL=http://$(container_ip tika):9998
   export BATS_REDIS_HOST=$(container_ip redis)
