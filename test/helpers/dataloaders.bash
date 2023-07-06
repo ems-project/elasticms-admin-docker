@@ -83,23 +83,6 @@ function configure_pgsql {
 
 }
 
-function copy_to_s3bucket {
-
-  local -r _filename=$1
-  local -r _bucket=$2
-  local -r _endpoint=$3
-
-  local -r _basename=$(basename $_filename)
-  local -r _name=${_basename%.*}
-  local -r _relative=${_filename#"${BATS_TEST_DIRNAME}/"}
-
-  local -r _copy_status=0
-
-  run aws s3 cp ${_filename} s3://${_bucket%/}/ --endpoint-url ${_endpoint}
-  assert_output -l -r ".*upload: test/${_relative} to s3://${_bucket%/}/${_basename}.*"
-
-}
-
 function provision-docker-volume {
 
   local -r CONTENT_PATH=${1}

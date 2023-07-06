@@ -117,23 +117,20 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Loading Elasticms Config files in Configuration S3 Bucket." {
 
+  export BATS_S3_ENDPOINT_URL=http://$(container_ip minio):9000
+
   for file in ${BATS_TEST_DIRNAME%/}/demo/configs/elasticms-admin/*.env ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
 
-    copy_to_s3bucket $file ${BATS_S3_ELASTICMS_CONFIG_BUCKET_NAME%/}/ ${BATS_S3_ENDPOINT_URL}
+    run ${BATS_CONTAINER_ENGINE} run --workdir /tmp --rm -t --network ${BATS_CONTAINER_NETWORK_NAME} \
+                        -e AWS_ACCESS_KEY_ID="${BATS_S3_ACCESS_KEY_ID}" \
+                        -e AWS_SECRET_ACCESS_KEY="${BATS_S3_SECRET_ACCESS_KEY}" \
+                        -e AWS_DEFAULT_REGION="${BATS_S3_DEFAULT_REGION}" \
+                        -v ${file}:/tmp/${_name} \
+        docker.io/amazon/aws-cli:2.11.22 s3 cp /tmp/${_name} s3://${BATS_S3_ELASTICMS_CONFIG_BUCKET_NAME%/}/ --endpoint-url ${BATS_S3_ENDPOINT_URL}
 
-  done
-}
-
-@test "[$TEST_FILE] Loading Skeleton Config files in Configuration S3 Bucket." {
-
-  # TODO : update demo project to use more env vars in config file and use theses here (instead of manage own config files)
-  for file in ${BATS_TEST_DIRNAME%/}/configs/skeleton/*.env ; do
-    _basename=$(basename $file)
-    _name=${_basename%.*}
-
-    copy_to_s3bucket $file ${BATS_S3_SKELETON_CONFIG_BUCKET_NAME%/}/ ${BATS_S3_ENDPOINT_URL}
+    assert_output -l -r "upload: ./${_name} to s3://${BATS_S3_ELASTICMS_CONFIG_BUCKET_NAME%/}/${_name}"
 
   done
 }
