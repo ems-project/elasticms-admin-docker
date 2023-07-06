@@ -117,8 +117,7 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Loading Elasticms Config files in Configuration S3 Bucket." {
 
-  # TODO : update demo project to use more env vars in config file and use theses here (instead of manage own config files)
-  for file in ${BATS_TEST_DIRNAME%/}/configs/elasticms/*.env ; do
+  for file in ${BATS_TEST_DIRNAME%/}/demo/configs/elasticms-admin/*.env ; do
     _basename=$(basename $file)
     _name=${_basename%.*}
 
