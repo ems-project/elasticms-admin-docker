@@ -389,7 +389,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: [sign-prd,sign-dev]
     steps:
-      - uses: joutvhu/delete-artifact@v1
+      - uses: joutvhu/delete-artifact@v2
         with:
           name: |
             ${{ matrix.image-variant }}
