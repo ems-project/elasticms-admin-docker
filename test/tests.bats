@@ -209,22 +209,256 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 }
 
-@test "[$TEST_FILE] Login to Elasticms for admin." {
+@test "[$TEST_FILE] Login to Elasticms for configuration." {
 
-  run ${BATS_CONTAINER_ENGINE} exec ems ${BATS_ELASTICMS_ADMIN_ENVIRONMENT} ems:admin:login --no-debug ${BATS_ELASTICMS_SKELETON_BACKEND_URL} --username=${BATS_ELASTICMS_ADMIN_USERNAME} --password=${BATS_ELASTICMS_ADMIN_PASSWORD}
-  assert_output -r ".*\[OK\] Welcome ${BATS_ELASTICMS_ADMIN_USERNAME} on ${BATS_ELASTICMS_SKELETON_BACKEND_URL}"
-
-}
-
-@test "[$TEST_FILE] Restore elasticms configuration" {
-
-  run ${BATS_CONTAINER_ENGINE} exec ems ${BATS_ELASTICMS_ADMIN_ENVIRONMENT} ems:admin:restore --no-debug --configs --configs-folder=/opt/src/configs/admin --force
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:login --username=${BATS_ELASTICMS_ADMIN_USERNAME} --password=${BATS_ELASTICMS_ADMIN_PASSWORD} ${BATS_ELASTICMS_SKELETON_BACKEND_URL}
+  assert_output -r ".*\[OK\] Welcome ${BATS_ELASTICMS_ADMIN_USERNAME} on ${BATS_ELASTICMS_BACKEND_URL}"
 
 }
 
-@test "[$TEST_FILE] Activate Elasticms content types." {
+@test "[$TEST_FILE] Upload Elasticms assets." {
 
-  run ${BATS_CONTAINER_ENGINE} exec ems ${BATS_ELASTICMS_ADMIN_ENVIRONMENT} ems:contenttype:activate --all --force
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} emsch:local:folder-upload -- /opt/src/admin/assets
+  assert_output -r ".*\[OK\] .* \(on .*\) assets have been uploaded"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Filters." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter dutch_stemmer
+  assert_output -r "filter dutch_stemmer with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter dutch_stop
+  assert_output -r "filter dutch_stop with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter empty_elision
+  assert_output -r "filter empty_elision with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter english_stemmer
+  assert_output -r "filter english_stemmer with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter english_stop
+  assert_output -r "filter english_stop with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter french_elision
+  assert_output -r "filter french_elision with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter french_stemmer
+  assert_output -r "filter french_stemmer with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter french_stop
+  assert_output -r "filter french_stop with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter german_stemmer
+  assert_output -r "filter german_stemmer with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter german_stop
+  assert_output -r "filter german_stop with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Analyzers." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update analyzer alpha_order
+  assert_output -r "analyzer alpha_order with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update analyzer dutch_for_highlighting
+  assert_output -r "analyzer dutch_for_highlighting with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update analyzer english_for_highlighting
+  assert_output -r "analyzer english_for_highlighting with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update analyzer french_for_highlighting
+  assert_output -r "analyzer french_for_highlighting with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update analyzer german_for_highlighting
+  assert_output -r "analyzer german_for_highlighting with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update analyzer html_strip
+  assert_output -r "analyzer html_strip with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Schedules." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule check-aliases
+  assert_output -r "schedule check-aliases with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule clear-logs
+  assert_output -r "schedule clear-logs with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule publish-releases
+  assert_output -r "schedule publish-releases with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule remove-expired-submissions
+  assert_output -r "schedule remove-expired-submissions with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Wysiwygs." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-style-set bootstrap
+  assert_output -r "wysiwyg-style-set bootstrap with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-style-set revealjs
+  assert_output -r "wysiwyg-style-set revealjs with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Full
+  assert_output -r "wysiwyg-profile Full with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Light
+  assert_output -r "wysiwyg-profile Light with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Sample
+  assert_output -r "wysiwyg-profile Sample with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Standard
+  assert_output -r "wysiwyg-profile Standard with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms I18N." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n config
+  assert_output -r "i18n config with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n ems.documentation.body
+  assert_output -r "i18n ems.documentation.body with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n locale.fr
+  assert_output -r "i18n locale.fr with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n locale.nl
+  assert_output -r "i18n locale.nl with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n locale.de
+  assert_output -r "i18n locale.de with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n locale.en
+  assert_output -r "i18n locale.en with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n locales
+  assert_output -r "i18n locales with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n asset.type.manual
+  assert_output -r "i18n asset.type.manual with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Environments." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update environment default
+  assert_output -r "environment default with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update environment preview
+  assert_output -r "environment preview with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update environment live
+  assert_output -r "environment live with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Forms." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form add_menu_item
+  assert_output -r "form add_menu_item with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form dashboard_default_search_options
+  assert_output -r "form dashboard_default_search_options with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form dashboard_sitemap_options
+  assert_output -r "form dashboard_sitemap_options with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form display
+  assert_output -r "form display with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form label
+  assert_output -r "form label with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form menu-locales
+  assert_output -r "form menu-locales with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form search_fields
+  assert_output -r "form search_fields with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms ContentTypes." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type category
+  assert_output -r "content-type category with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type form_instance
+  assert_output -r "content-type form_instance with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type label
+  assert_output -r "content-type label with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type media_file
+  assert_output -r "content-type media_file with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type news
+  assert_output -r "content-type news with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type page
+  assert_output -r "content-type page with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type route
+  assert_output -r "content-type route with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type section
+  assert_output -r "content-type section with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type slideshow
+  assert_output -r "content-type slideshow with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type template
+  assert_output -r "content-type template with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type template_ems
+  assert_output -r "content-type template_ems with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type user_group
+  assert_output -r "content-type user_group with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms QuerySearches." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update query-search categories
+  assert_output -r "query-search categories with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update query-search pages
+  assert_output -r "query-search pages with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update query-search documents
+  assert_output -r "query-search documents with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update query-search forms
+  assert_output -r "query-search forms with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Dashboards." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard default-search
+  assert_output -r "dashboard default-search with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard media-library
+  assert_output -r "dashboard media-library with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard sitemap
+  assert_output -r "dashboard sitemap with id .* has been updated"
+
+}
+
+@test "[$TEST_FILE] Configure Elasticms Channels." {
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update channel preview
+  assert_output -r "channel preview with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update channel live
+  assert_output -r "channel live with id .* has been updated"
 
 }
 
@@ -239,32 +473,31 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 }
 
-@test "[$TEST_FILE] Restore elasticms documents" {
+@test "[$TEST_FILE] Activate Elasticms content types." {
 
-  run ${BATS_CONTAINER_ENGINE} exec ems ${BATS_ELASTICMS_ADMIN_ENVIRONMENT} ems:admin:restore --no-debug --documents --documents-folder=/opt/src/configs/document --force
+  run ${BATS_CONTAINER_ENGINE} exec ems ${BATS_ELASTICMS_ADMIN_ENVIRONMENT} ems:contenttype:activate --all
 
-}
-
-@test "[$TEST_FILE] Login to Elasticms for web." {
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} emsch:local:login ${BATS_ELASTICMS_ADMIN_USERNAME} ${BATS_ELASTICMS_ADMIN_PASSWORD}
-  assert_output -r ".*\[OK\] Welcome ${BATS_ELASTICMS_ADMIN_USERNAME} on ${BATS_ELASTICMS_SKELETON_BACKEND_URL}"
-
-}
-
-@test "[$TEST_FILE] Upload web assets." {
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} emsch:local:upload --filename=/opt/src/local/skeleton/template/asset_hash.twig
-  assert_output -r ".*\[OK\] Assets .* have been uploaded"
+  # Missing message when action is done (with success or not)
+  # assert_output -r ""
 
 }
 
 @test "[$TEST_FILE] Push templates, routes and translations." {
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} emsch:local:push --force
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:local:push --force
 
   # Missing message when action is done (with success or not)
   # assert_output -r ""
+
+}
+
+@test "[$TEST_FILE] Upload documents." {
+
+  for type in form_instance category page section slideshow media_file news user_group; do
+    run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:document:upload ${type}
+    # Missing message when action is done (with success or not)
+    # assert_output -r ""
+  done
 
 }
 
