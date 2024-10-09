@@ -3,9 +3,9 @@
 # Removes container $1
 function container_clean {
   run ${BATS_CONTAINER_ENGINE} kill $1 &>/dev/null ||:
-  sleep .25s
+  sleep 25
   run ${BATS_CONTAINER_ENGINE} rm -vf $1 &>/dev/null ||:
-  sleep .25s
+  sleep 25
 }
 
 # get the ip of container $1
@@ -78,7 +78,7 @@ function container_wait_for_log {
   local -r container=$1
   local -ir timeout_sec=$2
   shift 2
-  retry $(( $timeout_sec * 2 )) .5s container_assert_log $container "$*"
+  retry $(( $timeout_sec * 2 )) 5 container_assert_log $container "$*"
 }
 
 # wait for a container to produce a given text in its command output
@@ -90,7 +90,7 @@ function container_wait_for_command {
   local -r cmd=$2
   local -ir timeout_sec=$3
   shift 3
-  retry $(( $timeout_sec * 2 )) .5s container_assert_command $container "$cmd" "$*"
+  retry $(( $timeout_sec * 2 )) 5 container_assert_command $container "$cmd" "$*"
 }
 
 # wait for a container healthy state
@@ -100,5 +100,5 @@ function container_wait_for_healthy {
   local -r container=$1
   local -ir timeout_sec=$2
   shift 2
-  retry $(( $timeout_sec * 2 )) .5s container_assert_healthy $container
+  retry $(( $timeout_sec * 2 )) 0.5 container_assert_healthy $container
 }
