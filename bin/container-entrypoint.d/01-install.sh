@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+echo -e "\n    Install ElasticMS Admin Configuration files ...\n"
+
+mkdir -p ${APP_CONFIG_DIR}
+
+if [ ! -z "$AWS_S3_CONFIG_BUCKET_NAME" ]; then
+
+  export AWS_S3_CONFIG_BUCKET_NAME=${AWS_S3_CONFIG_BUCKET_NAME#s3://}
+
+  list=(`aws s3 ls ${AWS_S3_CONFIG_BUCKET_NAME%/}/ ${AWS_CLI_EXTRA_ARGS} | awk '{print $4}'`)
+
+  for config in ${list[@]};
+  do
+    name=${config%.*}
+    echo "    - Install s3://${AWS_S3_CONFIG_BUCKET_NAME%/}/$config to ${APP_CONFIG_DIR}/$name ..."
+    aws s3 cp s3://${AWS_S3_CONFIG_BUCKET_NAME%/}/$config ${AWS_CLI_EXTRA_ARGS} - | envsubst > ${APP_CONFIG_DIR}/$name
+  done
+
+elif [ "$(ls -A /app/config/elasticms)" ]; then
+
+  for file in /app/config/elasticms/*; do
+    name=$(basename "$file" .${file##*.})
+    echo "    - Install $file to ${APP_CONFIG_DIR}/$name ..."
+    envsubst < $file > ${APP_CONFIG_DIR}/$name
+  done
+
+else
+
+  echo "    - Install default to ${APP_CONFIG_DIR}/default ..."
+  env | envsubst > ${APP_CONFIG_DIR}/default
+
+fi
+
+echo -e "\n    ElasticMS Admin Configuration files installed succesfully ...\n"

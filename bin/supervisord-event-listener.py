@@ -16,7 +16,7 @@ def main(args):
         write_stdout('READY\n')
 
         # read header line from stdin
-        line = sys.stdin.readline()  
+        line = sys.stdin.readline()
         write_stderr(line)
 
         # read event payload and print it to stderr
