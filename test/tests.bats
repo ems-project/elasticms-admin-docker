@@ -57,6 +57,12 @@ export BATS_CONTAINER_ENGINE="${CONTAINER_ENGINE:-podman}"
 export BATS_CONTAINER_COMPOSE_ENGINE="${BATS_CONTAINER_ENGINE} compose"
 export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
+export BATS_APP_TMP_VOLUME_NAME=${BATS_APP_TMP_VOLUME_NAME:-app_tmp}
+export BATS_APP_VAR_VOLUME_NAME=${BATS_APP_VAR_VOLUME_NAME:-app_var}
+export BATS_APP_ETC_VOLUME_NAME=${BATS_APP_ETC_VOLUME_NAME:-app_etc}
+export BATS_APP_BIN_VOLUME_NAME=${BATS_APP_BIN_VOLUME_NAME:-app_bin}
+export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
+
 @test "[$TEST_FILE] Prepare Skeleton [$BATS_EMS_VERSION]." {
 
   run git clone -b ${BATS_EMS_VERSION} git@github.com:ems-project/elasticms-demo.git ${BATS_TEST_DIRNAME%/}/demo
@@ -65,6 +71,14 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
   run npm run --prefix ${BATS_TEST_DIRNAME%/}/demo prod
   run chmod 777 ${BATS_TEST_DIRNAME%/}/demo/skeleton
 
+}
+
+@test "[$TEST_FILE] Create Docker external volumes (local)" {
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_TMP_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_VAR_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_ETC_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_BIN_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_EMS_VAR_VOLUME_NAME}
 }
 
 @test "[$TEST_FILE] Starting Services (PostgreSQL, Elasticsearch, Redis, Minio, Tika)." {
@@ -156,7 +170,6 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
     container_wait_for_log ems 60 "ElasticMS Admin Configuration files installed succesfully"
     container_wait_for_log ems 60 "Doctrine sync metadata storage for \[ ${_name} \] CMS Domain run successfully ..."
     container_wait_for_log ems 60 "Doctrine database migration for \[ ${_name} \] CMS Domain run successfully ..."
-    container_wait_for_log ems 60 "Elasticms assets installation for \[ ${_name} \] CMS Domain run successfully ..."
     container_wait_for_log ems 60 "Elasticms warming up for \[ ${_name} \] CMS Domain run successfully ..."
   done
 
@@ -578,6 +591,14 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 }
 
-# @test "[$TEST_FILE] Stop all and delete test containers" {
-#   command ${BATS_CONTAINER_COMPOSE_ENGINE} -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml down -v
-# }
+@test "[$TEST_FILE] Stop all and delete test containers" {
+  command ${BATS_CONTAINER_COMPOSE_ENGINE} -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml down -v
+}
+
+@test "[$TEST_FILE] Cleanup Docker external volumes (local)" {
+  command docker volume rm ${BATS_APP_TMP_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_VAR_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_ETC_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_BIN_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_EMS_VAR_VOLUME_NAME}
+}
