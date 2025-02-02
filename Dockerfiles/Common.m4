@@ -20,12 +20,11 @@ ENV APP_DISABLE_DOTENV=true \
     EMS_METRIC_PORT="9090" \
     PATH=/app/bin:/app/sbin:/usr/local/bin:/usr/bin:$PATH
 
-RUN echo -e "\nListen ${EMS_METRIC_PORT}\n" >> /etc/apache2/httpd.conf \
-    && find /app -type d -exec chmod ugo+x {} \;
+RUN find /app -type d -exec chmod ugo+x {} \;
 
 USER ${PUID:-1001}
 
 EXPOSE ${EMS_METRIC_PORT}/tcp
 
-HEALTHCHECK --start-period=10s --interval=1m --timeout=5s --retries=5 \
+HEALTHCHECK --start-period=5s --interval=1m --timeout=2s --retries=5 \
         CMD curl --fail --header "Host: default.localhost" http://localhost:9000/index.php || exit 1
