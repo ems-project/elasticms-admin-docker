@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+export APACHE_PUBLIC_DIR="${APP_SRC_DIR}/public"
+export APACHE_ASSETS_DIR="${APACHE_PUBLIC_DIR}/bundles"
+
 SERVER_NAME_DEFAULT="localhost"
 SERVER_ALIASES_DEFAULT=""
 ALIAS_DEFAULT=""

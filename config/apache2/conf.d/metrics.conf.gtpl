@@ -8,8 +8,8 @@
       SetHandler "proxy:unix:/app/var/run/php-fpm/php-fpm.sock|fcgi://localhost/"
     </FilesMatch>
 
-    DocumentRoot {{ .Env.APP_SRC_DIR }}/public
-    <Directory {{ .Env.APP_SRC_DIR }}/public >
+    DocumentRoot {{ .Env.APACHE_PUBLIC_DIR }}
+    <Directory {{ .Env.APACHE_PUBLIC_DIR }} >
       AllowOverride None
       Order Allow,Deny
       Allow from All
@@ -17,7 +17,7 @@
       FallbackResource /index.php
     </Directory>
 
-    <Directory {{ .Env.APP_SRC_DIR }}/public/bundles>
+    <Directory {{ .Env.APACHE_ASSETS_DIR }} >
         FallbackResource disabled
     </Directory>
 
