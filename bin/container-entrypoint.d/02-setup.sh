@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-echo -e "\n    Configure ElasticMS Admin Container ...\n"
+log "INFO" "- Configure ElasticMS Admin Container"
 
 for I in $(find ${APP_CONFIG_DIR}/* | sort)
 do
+
+  log "INFO" "+ Configure ElasticMS [$(basename "$I" .${I##*.})] Admin instance"
 
   for FILE in $(find /app/bin/container-entrypoint.d/elasticms.d -iname \*.sh | sort)
   do
@@ -14,5 +16,3 @@ do
   done
 
 done
-
-echo -e "\n    ElasticMS Admin Container configured succesfully ...\n"

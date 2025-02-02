@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-echo -e "    Configure Apache VirtualHosts ..."
+log "INFO" "| Configure ElasticMS Apache VirtualHosts ..."
 
 if [[ ! -z ${APACHE_ENABLED} ]] && [[ ${APACHE_ENABLED,,} = true ]]; then
 
-  echo -e "    - Configure [ ${ELASTICMS_INSTANCE_NAME} ] VirtualHost for ElasticMS Admin on [ ${SERVER_NAME} ] ..."
+  log "INFO" "+ Configure [ ${ELASTICMS_INSTANCE_NAME} ] VirtualHost for ElasticMS Admin on [ ${SERVER_NAME} ]."
 
   gomplate -f /app/config/apache2/conf.d/elasticms.conf.gtpl \
            -o /app/etc/apache2/conf.d/${ELASTICMS_INSTANCE_NAME}-app.conf
@@ -15,12 +15,16 @@ if [[ ! -z ${APACHE_ENABLED} ]] && [[ ${APACHE_ENABLED,,} = true ]]; then
 
     if [ ! -f /app/etc/apache2/conf.d/__metrics.conf ] ; then
 
-      echo -e "    - Configure [ metrics ] VirtualHost for ElasticMS Admin on [ ${METRICS_VHOST_SERVER_NAME} ] ..."
+      if [[ ! -z ${EMS_METRIC_ENABLED} ]] && [[ ${EMS_METRIC_ENABLED,,} = true ]]; then
 
-      gomplate -f /app/config/apache2/conf.d/metrics.conf.gtpl \
-               -o /app/etc/apache2/conf.d/__metrics.conf
+        log "INFO" "+ Configure [ metrics ] VirtualHost for ElasticMS Admin on [ ${METRICS_VHOST_SERVER_NAME} ]."
 
-      cat ${APP_CONFIG_DIR}/${ELASTICMS_INSTANCE_NAME} | sed '/^\s*$/d' | grep  -v '^#' | sed "s/\([a-zA-Z0-9_]*\)\=\(.*\)/        SetEnv \1 \2/g" >> /app/etc/apache2/conf.d/__metrics.env
+        gomplate -f /app/config/apache2/conf.d/metrics.conf.gtpl \
+                 -o /app/etc/apache2/conf.d/__metrics.conf
+
+        cat ${APP_CONFIG_DIR}/${ELASTICMS_INSTANCE_NAME} | sed '/^\s*$/d' | grep  -v '^#' | sed "s/\([a-zA-Z0-9_]*\)\=\(.*\)/SetEnv \1 \2/g" >> /app/etc/apache2/conf.d/__metrics.env
+
+      fi
 
     fi
 

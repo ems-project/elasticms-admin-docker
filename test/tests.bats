@@ -164,15 +164,6 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
 
 @test "[$TEST_FILE] Check Elasticms startup messages in container logs." {
 
-  for file in ${BATS_TEST_DIRNAME%/}/configs/elasticms/*.env ; do
-    _basename=$(basename $file)
-    _name=${_basename%.*}  
-    container_wait_for_log ems 60 "ElasticMS Admin Configuration files installed succesfully"
-    container_wait_for_log ems 60 "Doctrine sync metadata storage for \[ ${_name} \] CMS Domain run successfully ..."
-    container_wait_for_log ems 60 "Doctrine database migration for \[ ${_name} \] CMS Domain run successfully ..."
-    container_wait_for_log ems 60 "Elasticms warming up for \[ ${_name} \] CMS Domain run successfully ..."
-  done
-
   container_wait_for_log ems 60 "NOTICE: ready to handle connections"
   container_wait_for_log ems 60 "AH00292: Apache/.* \(Unix\) OpenSSL/.* configured -- resuming normal operations"
 

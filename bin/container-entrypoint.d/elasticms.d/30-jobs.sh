@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-echo -e "    Configure ElasticMS Admin Jobs ..."
+log "INFO" "| Configure ElasticMS Admin Jobs"
 
 if [[ ! -z ${JOBS_ENABLED} ]] && [[ ${JOBS_ENABLED,,} = true ]]; then
 
-  echo -e "    > Use Supervisor for running ElasticMS Admin Jobs ..."
+  log "INFO" "+ Use Supervisor for running ElasticMS Admin Jobs ..."
 
   gomplate -f /app/config/supervisor/eventlistener.ini.gtpl \
            -o /app/etc/supervisor.d/${ELASTICMS_INSTANCE_NAME}
@@ -16,6 +16,6 @@ if [[ ! -z ${JOBS_ENABLED} ]] && [[ ${JOBS_ENABLED,,} = true ]]; then
 
 else
 
-  echo -e "    > Use PHP-FPM for running ElasticMS Admin Jobs ..."
+  log "INFO" "+ Use PHP-FPM for running ElasticMS Admin Jobs ..."
 
 fi
