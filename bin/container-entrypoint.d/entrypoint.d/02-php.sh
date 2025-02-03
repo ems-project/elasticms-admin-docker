@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+PHP_MAX_INPUT_VARS_DEFAULT="4000"
+
+export PHP_MAX_INPUT_VARS=${PHP_MAX_INPUT_VARS:-"${PHP_MAX_INPUT_VARS_DEFAULT}"}
+
+true

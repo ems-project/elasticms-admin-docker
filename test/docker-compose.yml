@@ -142,8 +142,15 @@ services:
       - JOBS_ENABLED=${BATS_JOBS_ENABLED}
       - METRICS_ENABLED=${BATS_METRICS_ENABLED}
       - CLI_PHP_MEMORY_LIMIT=512M
-    command: ["wait-for-it", "${BATS_DB_HOST}:${BATS_DB_PORT}", "--", "/usr/bin/supervisord", "-c", "/etc/supervisord/supervisord.conf"]
+    volumes:
+      - app_bin:/app/sbin
+      - app_var:/app/var
+      - app_etc:/app/etc
+      - app_tmp:/app/tmp
+      - app_ems_var:/app/src/elasticms/var
+    command: ["wait-for-it", "${BATS_DB_HOST}:${BATS_DB_PORT}", "--", "/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
     mem_limit: 512m
+    read_only: true
 
   emsch:
     image: docker.io/elasticms/website-skeleton:5
@@ -175,6 +182,23 @@ services:
       - ./demo/skeleton:/opt/src/local/demo_pgsql_v1_preview
       - ./demo/skeleton:/opt/src/local/demo_pgsql_v1_live
     mem_limit: 512m
+
+volumes:
+  app_bin:
+    external:
+      name: ${BATS_APP_BIN_VOLUME_NAME}
+  app_var:
+    external:
+      name: ${BATS_APP_VAR_VOLUME_NAME}
+  app_ems_var:
+    external:
+      name: ${BATS_APP_EMS_VAR_VOLUME_NAME}
+  app_etc:
+    external:
+      name: ${BATS_APP_ETC_VOLUME_NAME}
+  app_tmp:
+    external:
+      name: ${BATS_APP_TMP_VOLUME_NAME}
 
 networks:
   default:

@@ -57,6 +57,12 @@ export BATS_CONTAINER_ENGINE="${CONTAINER_ENGINE:-podman}"
 export BATS_CONTAINER_COMPOSE_ENGINE="${BATS_CONTAINER_ENGINE} compose"
 export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
+export BATS_APP_TMP_VOLUME_NAME=${BATS_APP_TMP_VOLUME_NAME:-app_tmp}
+export BATS_APP_VAR_VOLUME_NAME=${BATS_APP_VAR_VOLUME_NAME:-app_var}
+export BATS_APP_ETC_VOLUME_NAME=${BATS_APP_ETC_VOLUME_NAME:-app_etc}
+export BATS_APP_BIN_VOLUME_NAME=${BATS_APP_BIN_VOLUME_NAME:-app_bin}
+export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
+
 @test "[$TEST_FILE] Prepare Skeleton [$BATS_EMS_VERSION]." {
 
   run git clone -b ${BATS_EMS_VERSION} git@github.com:ems-project/elasticms-demo.git ${BATS_TEST_DIRNAME%/}/demo
@@ -65,6 +71,14 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
   run npm run --prefix ${BATS_TEST_DIRNAME%/}/demo prod
   run chmod 777 ${BATS_TEST_DIRNAME%/}/demo/skeleton
 
+}
+
+@test "[$TEST_FILE] Create Docker external volumes (local)" {
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_TMP_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_VAR_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_ETC_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_BIN_VOLUME_NAME}
+  command ${BATS_CONTAINER_ENGINE} volume create -d local ${BATS_APP_EMS_VAR_VOLUME_NAME}
 }
 
 @test "[$TEST_FILE] Starting Services (PostgreSQL, Elasticsearch, Redis, Minio, Tika)." {
@@ -150,15 +164,6 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Check Elasticms startup messages in container logs." {
 
-  for file in ${BATS_TEST_DIRNAME%/}/configs/elasticms/*.env ; do
-    _basename=$(basename $file)
-    _name=${_basename%.*}
-    container_wait_for_log ems 60 "Install \[ ${_name} \] CMS Domain from S3 Bucket \[ ${_basename} \] file successfully ..."
-    container_wait_for_log ems 60 "Doctrine database migration for \[ ${_name} \] CMS Domain run successfully ..."
-    container_wait_for_log ems 60 "Elasticms assets installation for \[ ${_name} \] CMS Domain run successfully ..."
-    container_wait_for_log ems 60 "Elasticms warming up for \[ ${_name} \] CMS Domain run successfully ..."
-  done
-
   container_wait_for_log ems 60 "NOTICE: ready to handle connections"
   container_wait_for_log ems 60 "AH00292: Apache/.* \(Unix\) OpenSSL/.* configured -- resuming normal operations"
 
@@ -189,22 +194,22 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Create Elasticms Super Admin user." {
 
-  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/opt/bin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:create --super-admin --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ${BATS_ELASTICMS_ADMIN_EMAIL} ${BATS_ELASTICMS_ADMIN_PASSWORD}"
+  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/app/sbin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:create --super-admin --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ${BATS_ELASTICMS_ADMIN_EMAIL} ${BATS_ELASTICMS_ADMIN_PASSWORD}"
   assert_output -r ".*\[OK\] Created user \"${BATS_ELASTICMS_ADMIN_USERNAME}\""
 
-  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/opt/bin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_API"
+  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/app/sbin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_API"
   assert_output -r ".*\[OK\] Role \"ROLE_API\" has been added to user \"${BATS_ELASTICMS_ADMIN_USERNAME}\".*"
 
-  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/opt/bin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_COPY_PASTE"
+  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/app/sbin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_COPY_PASTE"
   assert_output -r ".*\[OK\] Role \"ROLE_COPY_PASTE\" has been added to user \"${BATS_ELASTICMS_ADMIN_USERNAME}\".*"
 
-  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/opt/bin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_ALLOW_ALIGN"
+  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/app/sbin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_ALLOW_ALIGN"
   assert_output -r ".*\[OK\] Role \"ROLE_ALLOW_ALIGN\" has been added to user \"${BATS_ELASTICMS_ADMIN_USERNAME}\".*"
 
-  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/opt/bin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_FORM_CRM"
+  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/app/sbin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_FORM_CRM"
   assert_output -r ".*\[OK\] Role \"ROLE_FORM_CRM\" has been added to user \"${BATS_ELASTICMS_ADMIN_USERNAME}\".*"
 
-  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/opt/bin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_TASK_MANAGER"
+  run ${BATS_CONTAINER_ENGINE} exec ems sh -c "/app/sbin/${BATS_ELASTICMS_ADMIN_ENVIRONMENT} emsco:user:promote --no-debug ${BATS_ELASTICMS_ADMIN_USERNAME} ROLE_TASK_MANAGER"
   assert_output -r ".*\[OK\] Role \"ROLE_TASK_MANAGER\" has been added to user \"${BATS_ELASTICMS_ADMIN_USERNAME}\".*"
 
 }
@@ -579,4 +584,12 @@ export BATS_CONTAINER_NETWORK_NAME="${CONTAINER_NETWORK_NAME:-docker_default}"
 
 @test "[$TEST_FILE] Stop all and delete test containers" {
   command ${BATS_CONTAINER_COMPOSE_ENGINE} -f ${BATS_TEST_DIRNAME%/}/docker-compose.yml down -v
+}
+
+@test "[$TEST_FILE] Cleanup Docker external volumes (local)" {
+  command docker volume rm ${BATS_APP_TMP_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_VAR_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_ETC_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_BIN_VOLUME_NAME}
+  command docker volume rm ${BATS_APP_EMS_VAR_VOLUME_NAME}
 }

@@ -206,7 +206,7 @@ jobs:
           CONTAINER_ENGINE: docker
         run: |
           docker network create docker_default
-          docker pull docker.io/curlimages/curl:8.1.2
+          docker pull docker.io/curlimages/curl:8.11.1
           bats -r test/tests.bats
 
   sign-dev:
