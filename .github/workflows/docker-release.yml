@@ -132,7 +132,7 @@ jobs:
         id: prep_demo
         run: |
           mkdir -p test/demo/dist
-          npm install --save-dev webpack --prefix test/demo test/demo
+          npm install --prefix test/demo
           npm run --prefix test/demo build
           chmod 777 test/demo/skeleton
 
