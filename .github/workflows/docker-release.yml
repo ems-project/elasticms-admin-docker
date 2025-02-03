@@ -133,7 +133,7 @@ jobs:
         run: |
           mkdir -p test/demo/dist
           npm install --save-dev webpack --prefix test/demo test/demo
-          npm run --prefix test/demo prod
+          npm run --prefix test/demo build
           chmod 777 test/demo/skeleton
 
       - name: Setup BATS testing framework
