@@ -2,7 +2,7 @@ ENV ELASTICMS_VERSION=${VERSION_ARG:-6.0.0} \
     ELASTICMS_DOWNLOAD_URL="https://github.com/ems-project/elasticms-admin/archive" \
     APP_DISABLE_DOTENV=true \
     EMSCO_TIKA_SERVER=http://null \
-    MAILER_URL=http://null
+    MAILER_URL=smtp://null
 
 WORKDIR /app/src/elasticms
 
