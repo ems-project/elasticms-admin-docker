@@ -9,7 +9,7 @@ if [[ "$DB_DRIVER" =~ ^.*pgsql$ ]]; then
   fi
 fi
 
-${APP_BIN_DIR}/${ELASTICMS_INSTANCE_NAME} doctrine:migrations:sync-metadata-storage --no-interaction --env=prod
+${APP_BIN_DIR}/${ELASTICMS_INSTANCE_NAME} doctrine:migrations:sync-metadata-storage --no-interaction --env=${APP_ENV}
 
 if [ $? -ne 0 ]; then
   log "ERROR" "! Something doesn't work with doctrine sync metadata  !"
@@ -17,7 +17,7 @@ fi
 
 log "INFO" "+ Running Doctrine database migration for [ ${ELASTICMS_INSTANCE_NAME} ] CMS Domain ..."
 
-${APP_BIN_DIR}/${ELASTICMS_INSTANCE_NAME} doctrine:migrations:migrate --no-interaction --env=prod
+${APP_BIN_DIR}/${ELASTICMS_INSTANCE_NAME} doctrine:migrations:migrate --no-interaction --env=${APP_ENV}
 
 if [ $? -ne 0 ]; then
   log "ERROR" "! Something doesn't work with Doctrine database migration !"
