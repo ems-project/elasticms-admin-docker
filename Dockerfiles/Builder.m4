@@ -16,4 +16,4 @@ RUN set -x ; \
     rm -rf /app/src/elasticms/vendor/elasticms/admin-ui-bundle/assets/node_modules ; \
     \
     php /app/src/elasticms/bin/console assets:install /app/src/elasticms/public --symlink --no-interaction --env=prod ; \
-    mkdir -p /app/src/elasticms/var ;
+    rm -rf /app/src/elasticms/var/* ;
