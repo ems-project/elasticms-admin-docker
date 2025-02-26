@@ -286,17 +286,17 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
 
 @test "[$TEST_FILE] Configure Elasticms Schedules." {
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule check-aliases
-  assert_output -r "schedule check-aliases with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule check_aliases
+  assert_output -r "schedule check_aliases with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule clear-logs
-  assert_output -r "schedule clear-logs with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule clear_logs
+  assert_output -r "schedule clear_logs with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule publish-releases
-  assert_output -r "schedule publish-releases with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule publish_releases
+  assert_output -r "schedule publish_releases with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule remove-expired-submissions
-  assert_output -r "schedule remove-expired-submissions with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule remove_expired_submissions
+  assert_output -r "schedule remove_expired_submissions with id .* has been updated"
 
 }
 
@@ -304,21 +304,6 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
 
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-style-set bootstrap
   assert_output -r "wysiwyg-style-set bootstrap with id .* has been updated"
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-style-set revealjs
-  assert_output -r "wysiwyg-style-set revealjs with id .* has been updated"
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Full
-  assert_output -r "wysiwyg-profile Full with id .* has been updated"
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Light
-  assert_output -r "wysiwyg-profile Light with id .* has been updated"
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Sample
-  assert_output -r "wysiwyg-profile Sample with id .* has been updated"
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update wysiwyg-profile Standard
-  assert_output -r "wysiwyg-profile Standard with id .* has been updated"
 
 }
 
@@ -345,8 +330,8 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n locales
   assert_output -r "i18n locales with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n asset.type.manual
-  assert_output -r "i18n asset.type.manual with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update i18n overview.legend
+  assert_output -r "i18n overview.legend with id .* has been updated"
 
 }
 
@@ -380,8 +365,8 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form label
   assert_output -r "form label with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form menu-locales
-  assert_output -r "form menu-locales with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form menu_locales
+  assert_output -r "form menu_locales with id .* has been updated"
 
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update form search_fields
   assert_output -r "form search_fields with id .* has been updated"
@@ -399,6 +384,9 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type label
   assert_output -r "content-type label with id .* has been updated"
 
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type link
+  assert_output -r "content-type link with id .* has been updated"
+
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type media_file
   assert_output -r "content-type media_file with id .* has been updated"
 
@@ -414,17 +402,11 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type section
   assert_output -r "content-type section with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type slideshow
-  assert_output -r "content-type slideshow with id .* has been updated"
-
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type template
   assert_output -r "content-type template with id .* has been updated"
 
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type template_ems
   assert_output -r "content-type template_ems with id .* has been updated"
-
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update content-type user_group
-  assert_output -r "content-type user_group with id .* has been updated"
 
 }
 
@@ -446,14 +428,26 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
 
 @test "[$TEST_FILE] Configure Elasticms Dashboards." {
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard default-search
-  assert_output -r "dashboard default-search with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard default_search
+  assert_output -r "dashboard default_search with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard media-library
-  assert_output -r "dashboard media-library with id .* has been updated"
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard media_lib_browse_file
+  assert_output -r "dashboard media_lib_browse_file with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard media_lib_browse_image
+  assert_output -r "dashboard media_lib_browse_image with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard media_lib_browse_object
+  assert_output -r "dashboard media_lib_browse_object with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard media_library
+  assert_output -r "dashboard media_library with id .* has been updated"
 
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard sitemap
   assert_output -r "dashboard sitemap with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update dashboard tasks
+  assert_output -r "dashboard tasks with id .* has been updated"
 
 }
 
