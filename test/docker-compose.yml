@@ -142,6 +142,7 @@ services:
       - JOBS_ENABLED=${BATS_JOBS_ENABLED}
       - METRICS_ENABLED=${BATS_METRICS_ENABLED}
       - CLI_PHP_MEMORY_LIMIT=512M
+      - MESSENGER_TRANSPORT_DSN=redis://${BATS_REDIS_HOST}:${BATS_REDIS_PORT}/messages
     volumes:
       - app_bin:/app/sbin
       - app_var:/app/var
