@@ -126,7 +126,7 @@ jobs:
         with:
           repository: ems-project/elasticms-demo
           path: test/demo
-          ref: ${{ needs.init.outputs.version-patch }}
+          ref: ${{ needs.init.outputs.tag-patch }}
 
       - name: Prepare Elasticms Demo Project
         id: prep_demo
