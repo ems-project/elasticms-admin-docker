@@ -1,17 +1,17 @@
-# syntax=docker/dockerfile:1.3
-FROM docker.io/elasticms/base-php:8.4-apache-dev as builder
+# syntax=docker/dockerfile:1.15
+FROM docker.io/elasticms/base-php:8.4-apache-dev AS builder
 
 # include(Args.m4)
 # include(Builder.m4)
 
-FROM docker.io/elasticms/base-php:8.4-apache as prd
+FROM docker.io/elasticms/base-php:8.4-apache AS prd
 
 LABEL be.fgov.elasticms.admin.environment="prd"
 
 # include(Args.m4)
 # include(Common.m4)
 
-FROM docker.io/elasticms/base-php:8.4-apache-dev as dev
+FROM docker.io/elasticms/base-php:8.4-apache-dev AS dev
 
 LABEL be.fgov.elasticms.admin.environment="dev"
 

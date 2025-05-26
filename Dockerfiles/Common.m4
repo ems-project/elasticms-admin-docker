@@ -11,10 +11,10 @@ LABEL be.fgov.elasticms.admin.build-date=$BUILD_DATE_ARG \
 
 USER root
 
-COPY --chmod=775 --chown=${PUID:-1001}:0 bin/ /app/bin/
-COPY --chmod=664 --chown=${PUID:-1001}:0 config/ /app/config/
+COPY --chmod=775 --chown=1001:0 bin/ /app/bin/
+COPY --chmod=664 --chown=1001:0 config/ /app/config/
 
-COPY --chmod=664 --chown=${PUID:-1001}:0 --from=builder /app/src/elasticms /app/src/elasticms
+COPY --chmod=664 --chown=1001:0 --from=builder /app/src/elasticms /app/src/elasticms
 
 ENV APP_DISABLE_DOTENV=true \
     EMS_METRIC_PORT="9090" \
@@ -22,7 +22,7 @@ ENV APP_DISABLE_DOTENV=true \
 
 RUN find /app -type d -exec chmod ugo+x {} \;
 
-USER ${PUID:-1001}
+USER 1001
 
 EXPOSE ${EMS_METRIC_PORT}/tcp
 
