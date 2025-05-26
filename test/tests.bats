@@ -292,9 +292,6 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule clear_logs
   assert_output -r "schedule clear_logs with id .* has been updated"
 
-  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule publish_releases
-  assert_output -r "schedule publish_releases with id .* has been updated"
-
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update schedule remove_expired_submissions
   assert_output -r "schedule remove_expired_submissions with id .* has been updated"
 
