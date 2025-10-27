@@ -100,7 +100,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Upload "${{ needs.init.outputs.docker-image-name }}:${{ needs.init.outputs.github-ci-sha-short }}-${{ matrix.image-variant }}" Docker image artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.image-variant }}
           path: /tmp/builded.tar
