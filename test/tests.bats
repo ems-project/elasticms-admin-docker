@@ -230,6 +230,12 @@ export BATS_APP_EMS_VAR_VOLUME_NAME=${BATS_APP_EMS_VAR_VOLUME_NAME:-app_ems_var}
 
 @test "[$TEST_FILE] Configure Elasticms Filters." {
 
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter acronym_keyword
+  assert_output -r "filter acronym_keyword with id .* has been updated"
+
+  run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter business_synonyms
+  assert_output -r "filter business_synonyms with id .* has been updated"
+
   run ${BATS_CONTAINER_ENGINE} exec emsch ${BATS_ELASTICMS_SKELETON_ENVIRONMENT} ems:admin:update filter dutch_stemmer
   assert_output -r "filter dutch_stemmer with id .* has been updated"
 
