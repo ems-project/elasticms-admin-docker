@@ -38,18 +38,14 @@
 
 {{- if ne .Env.ALIAS "" }}
     Alias {{ .Env.ALIAS }} {{ .Env.APACHE_PUBLIC_DIR }}
-    RewriteCond %{REQUEST_URI} ^{{ .Env.ALIAS }}/bundles/emsch_assets/ [OR]
-    RewriteCond %{REQUEST_URI} ^{{ .Env.ALIAS }}/bundles/data/ [OR]
-    RewriteCond %{REQUEST_URI} ^{{ .Env.ALIAS }}/bundles/public/ [OR]
-    RewriteCond %{REQUEST_URI} ^{{ .Env.ALIAS }}/bundles/asset/
-    RewriteRule "^{{ .Env.ALIAS }}" "{{ .Env.ALIAS }}/index.php$1" [PT]
+
+    RewriteCond %{REQUEST_URI} ^{{ .Env.ALIAS }}/(.+)$
+    RewriteCond {{ .Env.APACHE_PUBLIC_DIR }}/%1 -f [OR]
+    RewriteCond {{ .Env.APACHE_PUBLIC_DIR }}/%1 -d
+    RewriteRule ^ - [L]
 
     RewriteCond %{REQUEST_URI} !^{{ .Env.ALIAS }}/index.php
-    RewriteCond %{REQUEST_URI} !^{{ .Env.ALIAS }}/bundles/
-    RewriteCond %{REQUEST_URI} !^{{ .Env.ALIAS }}/favicon.ico$
-    RewriteCond %{REQUEST_URI} !^{{ .Env.ALIAS }}/apple-touch-icon.png$
-    RewriteCond %{REQUEST_URI} !^{{ .Env.ALIAS }}/robots.txt$
-    RewriteRule ^{{ .Env.ALIAS }} {{ .Env.ALIAS }}/index.php$1 [PT]
+    RewriteRule ^{{ .Env.ALIAS }} {{ .Env.ALIAS }}/index.php$1 [PT,L,QSA]
 {{- end }}
 
     IncludeOptional /app/etc/apache2/conf.d/{{ .Env.ELASTICMS_INSTANCE_NAME }}-app.env
