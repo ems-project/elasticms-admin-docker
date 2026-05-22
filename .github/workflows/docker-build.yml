@@ -14,16 +14,31 @@ jobs:
       matrix:
         image-variant: [prd,dev]
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Create Dockerfile
+        run: |
+          make Dockerfile
+
+      - name: Setup Bats and bats libs
+        id: setup-bats
+        uses: bats-core/bats-action@3.0.1
+        with:
+          bats-install: true
+          bats-version: 1.10.0
+          support-install: false
+          assert-install: false
+          detik-install: false
+          file-install: false
 
       - name: Fill GitHub Environment Variables
         uses: FranzDiebold/github-env-vars-action@v2
 
       - name: Fill PHP Version Environment Variable
-        uses: c-py/action-dotenv-to-setenv@v4
+        uses: c-py/action-dotenv-to-setenv@v5
         with:
           env-file: .build.env
 
@@ -46,21 +61,9 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Create Dockerfile
-        run: |
-          make Dockerfile
-
       - name: Build "${{ steps.prep.outputs.docker-image-name }}" Docker Image
         id: build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -76,6 +79,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=docker,dest=/tmp/image.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Load Docker Image
         run: |
