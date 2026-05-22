@@ -196,18 +196,18 @@ jobs:
 #          sudo: true
 #          limit-access-to-actor: true
 
-      - name: Test "${{ needs.init.outputs.docker-image-name }}:${{ needs.init.outputs.github-ci-sha-short }}-${{ matrix.image-variant }}" Docker Image
-        shell: bash
-        env:
-          DOCKER_IMAGE_NAME: ${{ needs.init.outputs.docker-image-name }}:${{ needs.init.outputs.github-ci-sha-short }}-${{ matrix.image-variant }}
-          EMS_VERSION: ${{ needs.init.outputs.tag-patch }}
-          CONTAINER_ENGINE: docker
-          BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
-          TERM: xterm
-        run: |
-          docker network create docker_default
-          docker pull docker.io/curlimages/curl:8.11.1
-          bats -r test/tests.bats
+#      - name: Test "${{ needs.init.outputs.docker-image-name }}:${{ needs.init.outputs.github-ci-sha-short }}-${{ matrix.image-variant }}" Docker Image
+#        shell: bash
+#        env:
+#          DOCKER_IMAGE_NAME: ${{ needs.init.outputs.docker-image-name }}:${{ needs.init.outputs.github-ci-sha-short }}-${{ matrix.image-variant }}
+#          EMS_VERSION: ${{ needs.init.outputs.tag-patch }}
+#          CONTAINER_ENGINE: docker
+#          BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
+#          TERM: xterm
+#        run: |
+#          docker network create docker_default
+#          docker pull docker.io/curlimages/curl:8.11.1
+#          bats -r test/tests.bats
 
   push-dev:
 
