@@ -22,7 +22,7 @@ services:
     mem_limit: 512m
 
   tika:
-    image: docker.io/smalswebtech/tika-server:latest
+    image: docker.io/apache/tika:4.0.0-1@sha256:a8b442501f601fb15015de974f9afe13dd242b0f14e49a2b144fadcb214a555b
     container_name: tika
     networks:
       - default
