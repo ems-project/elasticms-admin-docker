@@ -3,7 +3,7 @@ version: "2.4"
 services:
 
   minio:
-    image: minio/minio
+    image: quay.io/minio/minio:latest
     container_name: minio
     ports:
       - 19000:9000
