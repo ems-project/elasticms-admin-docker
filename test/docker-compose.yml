@@ -2,21 +2,26 @@ version: "2.4"
 
 services:
 
-  minio:
-    image: quay.io/minio/minio:latest
-    container_name: minio
+  # S3 storage for the tests: SeaweedFS replaces MinIO, whose images are no
+  # longer pullable. The S3 gateway listens on 8333 (published on 19000, where
+  # the tests' host-side aws calls expect it) and creates an admin identity from
+  # AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY, as MINIO_ROOT_USER/PASSWORD did:
+  # requests signed with other keys, or unsigned, are refused.
+  seaweedfs:
+    image: docker.io/chrislusf/seaweedfs:4.47
+    container_name: seaweedfs
     ports:
-      - 19000:9000
-      - 19001:9001
+      - 19000:8333
     environment:
-      - MINIO_ROOT_USER=${BATS_S3_ACCESS_KEY_ID}
-      - MINIO_ROOT_PASSWORD=${BATS_S3_SECRET_ACCESS_KEY}
-    command: server /data --console-address ":9001"
+      - AWS_ACCESS_KEY_ID=${BATS_S3_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${BATS_S3_SECRET_ACCESS_KEY}
+    command: server -dir=/data -s3 -ip.bind=0.0.0.0
     healthcheck:
-      test: [ "CMD", "mc", "ready", "local" ]
+      # /status on the S3 port answers once the gateway serves requests.
+      test: [ "CMD", "curl", "-sf", "-o", "/dev/null", "http://localhost:8333/status" ]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 12
     networks:
       - default
     mem_limit: 512m
